@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-dark">Warden Command Center</h2>
+    <button class="btn btn-primary btn-sm" onclick="updateDashboardData()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh Live Data
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow-sm border-0">
+            <div class="card-body">
+                <h6>Total Students</h6>
+                <h2 id="totalStudents">{{ total_students }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow-sm border-0">
+            <div class="card-body">
+                <h6>Served Today</h6>
+                <h2 id="servedToday">--</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow-sm border-0">
+            <div class="card-body">
+                <h6>International</h6>
+                <h2>{{ international_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow-sm border-0">
+            <div class="card-body">
+                <h6>Current Session</h6>
+                <h2 id="currentMealDisplay">Detecting...</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5>Meal Distribution</h5>
+                    <select id="chartType" class="form-select form-select-sm" style="width: 100px;">
+                        <option value="bar">Bar</option>
+                        <option value="pie">Pie</option>
+                    </select>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="mealChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5>Recent Activity</h5>
+                <input type="text" id="logSearch" class="form-control form-control-sm mb-3" placeholder="Filter logs by name or ID...">
+                <div class="table-responsive" style="max-height: 300px;">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student</th>
+                                <th>Meal</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLogBody">
+    {% for log in logs %}
+    <tr class="log-row">
+        <td>
+            <strong>{{ log.student.name }}</strong><br>
+            <small class="text-muted">{{ log.student_id }}</small>
+        </td>
+        <td>
+            <span class="badge {% if log.meal_type == 'breakfast' %}bg-primary{% elif log.meal_type == 'lunch' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                {{ log.meal_type|capfirst }}
+            </span>
+        </td>
+        <td>{{ log.timestamp|date:"H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3" class="text-center text-muted">No meals recorded yet today.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
