@@ -2,15 +2,20 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.venv/
 venv/
 env/
+
+# Secrets and local config
 .env
 
 # Django
 db.sqlite3
-media/
-staticfiles/
+db.sqlite3-journal
+/media/
+/staticfiles/
 
-# Editors
+# OS / editor
+.DS_Store
 .vscode/
 .idea/
