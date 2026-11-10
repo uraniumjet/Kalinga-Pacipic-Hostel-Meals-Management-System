@@ -47,7 +47,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'student',
-    'meals',    
+    'meals',
+    # New, reusable core (replaces 'student' and 'meals' step by step)
+    'organizations',
+    'residents',
 ]
 
 MIDDLEWARE = [
