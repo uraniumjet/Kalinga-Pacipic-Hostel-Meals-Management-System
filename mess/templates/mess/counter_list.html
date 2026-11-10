@@ -1,0 +1,10 @@
+{% extends "accounts/base.html" %}
+{% block title %}Counters{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Choose a counter</h1>
+  {% for counter in counters %}
+    <p><a class="btn" style="text-decoration:none;display:inline-block" href="{% url 'mess:counter' counter.pk %}">{{ counter.name }}</a></p>
+  {% empty %}<p class="muted">No counters are set up yet. An admin can add them in the admin site.</p>{% endfor %}
+</div>
+{% endblock %}

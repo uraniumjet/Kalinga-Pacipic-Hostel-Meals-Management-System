@@ -10,6 +10,7 @@
       <p style="margin:.25rem 0">Room: {% with room=student.current_room %}{% if room %}{{ room }}{% else %}<span class="muted">none</span>{% endif %}{% endwith %}</p>
       <a href="{% url 'residents:edit' student.pk %}">Edit</a>
     </div>
+    <img src="{% url 'residents:qr' student.pk %}" width="110" height="110" alt="QR code for {{ student.name }}" style="margin-left:auto">
   </div>
 </div>
 <div class="card">

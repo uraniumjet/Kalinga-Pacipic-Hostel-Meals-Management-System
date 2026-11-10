@@ -80,11 +80,10 @@ def current_meal(student, now=None):
     return min(matches, key=lambda slot: slot.start)
 
 
-def record_collection(student, counter, recorded_by=None, collected_by=None, now=None):
-    """Record that a student's meal was served. Raises CollectionDenied if a rule is broken.
+def check_collection(student, counter, collected_by=None, now=None):
+    """Check the rules without writing anything.
 
-    collected_by: another student who collected the meal for `student` (proxy collection).
-    The collector's own meal is a separate call with the collector as `student`.
+    Returns (slot, collector) when the collection is allowed, otherwise raises CollectionDenied.
     """
     if student.status != student.Status.ACTIVE:
         raise CollectionDenied(CollectionDenied.NOT_ACTIVE, "This student is not active.")
@@ -113,7 +112,16 @@ def record_collection(student, counter, recorded_by=None, collected_by=None, now
             CollectionDenied.ALREADY_COLLECTED,
             f"{slot.meal_type.name} was already collected by {student.name} at {at:%H:%M}.",
         )
+    return slot, collector
 
+
+def record_collection(student, counter, recorded_by=None, collected_by=None, now=None):
+    """Record that a student's meal was served. Raises CollectionDenied if a rule is broken.
+
+    collected_by: optional audit field for a friend who collected the meal (the counter screen
+    leaves it empty: a proxy collection is recorded as if the student came in person).
+    """
+    slot, collector = check_collection(student, counter, collected_by, now)
     try:
         with transaction.atomic():
             return MealCollection.objects.create(

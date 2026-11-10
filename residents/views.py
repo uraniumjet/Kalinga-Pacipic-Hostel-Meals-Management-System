@@ -1,7 +1,11 @@
+from io import BytesIO
+
+import qrcode
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Prefetch, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.access import students_for
@@ -57,3 +61,12 @@ def student_create(request):
 def student_edit(request, pk):
     student = get_object_or_404(students_for(request.staff), pk=pk)
     return _save_form(request, student, f"Edit {student.name}")
+
+
+@staff_required
+def student_qr(request, pk):
+    """PNG of the student's QR code. It encodes a random token, never the roll number."""
+    student = get_object_or_404(students_for(request.staff), pk=pk)
+    buffer = BytesIO()
+    qrcode.make(str(student.qr_token), box_size=8, border=2).save(buffer, format="PNG")
+    return HttpResponse(buffer.getvalue(), content_type="image/png")

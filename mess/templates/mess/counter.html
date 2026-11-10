@@ -1,0 +1,43 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ counter.name }} counter{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="row" style="justify-content:space-between">
+    <h1 style="margin:0">{{ counter.name }} counter</h1>
+    <span class="muted">{{ served_today }} served today</span>
+  </div>
+  <form method="get" class="row" style="margin-top:1rem">
+    <input type="search" name="q" value="{{ q }}" placeholder="Scan QR, or type roll number or name" style="flex:1;min-width:12rem"
+           {% if not results %}autofocus{% endif %} autocomplete="off">
+    <button type="submit">Find</button>
+  </form>
+</div>
+
+{% if q and not results %}<div class="card"><p class="error">No student found for "{{ q }}".</p></div>{% endif %}
+
+{% for item in results %}
+<div class="card">
+  <div class="row">
+    {% if item.student.photo %}<img class="photo" src="{{ item.student.photo.url }}" alt="Photo of {{ item.student.name }}">{% else %}<div class="photo"></div>{% endif %}
+    <div style="flex:1;min-width:10rem">
+      <h2 style="margin:0">{{ item.student.name }}</h2>
+      <p class="muted" style="margin:.25rem 0">{{ item.student.roll_number }} &middot; {{ item.student.category.name }} &middot; {{ item.student.diet.name }}</p>
+      {% if item.problem %}<p class="error" style="margin:.25rem 0"><strong>{{ item.problem }}</strong></p>{% endif %}
+    </div>
+    {% if not item.problem %}
+    <form method="post">{% csrf_token %}
+      <input type="hidden" name="student" value="{{ item.student.pk }}">
+      <button type="submit" {% if forloop.first and results|length == 1 %}autofocus{% endif %}>Serve {{ item.meal }}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+
+<div class="card">
+  <h2>Recently served here</h2>
+  {% for row in recent %}
+    <p>{{ row.time }} &middot; {{ row.collection.student.name }} <span class="muted">({{ row.collection.student.roll_number }}) &middot; {{ row.collection.meal_type.name }}</span></p>
+  {% empty %}<p class="muted">Nothing served yet today.</p>{% endfor %}
+</div>
+{% endblock %}
