@@ -9,8 +9,10 @@ Rules
 - Meal counters are organisation-wide: any staff member can serve any active student of
   their organisation, whichever hostel the student lives in.
 """
+from django.db.models import Q
+
 from organizations.models import Hostel, StaffProfile
-from residents.models import Student
+from residents.models import RoomAllocation, Student
 
 
 def get_staff(user):
@@ -40,11 +42,12 @@ def students_for(staff):
     students = Student.objects.filter(organization=staff.organization)
     if is_admin(staff):
         return students
-    in_my_hostels = students.filter(
-        allocations__end_date__isnull=True, allocations__room__hostel__in=hostels_for(staff)
+    current = RoomAllocation.objects.filter(end_date__isnull=True)
+    in_my_hostels = current.filter(room__hostel__in=hostels_for(staff)).values("student_id")
+    housed = current.values("student_id")
+    return students.filter(
+        Q(pk__in=in_my_hostels) | (Q(status=Student.Status.ACTIVE) & ~Q(pk__in=housed))
     )
-    unallocated = students.filter(status=Student.Status.ACTIVE).exclude(allocations__end_date__isnull=True)
-    return (in_my_hostels | unallocated).distinct()
 
 
 def can_manage_student(staff, student):
