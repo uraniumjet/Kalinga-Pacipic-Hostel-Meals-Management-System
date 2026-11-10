@@ -3,7 +3,10 @@
 Nothing here is specific to one institution. Categories, diet types, hostels
 and rooms are rows that an administrator creates, not hard-coded choices.
 """
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -12,6 +15,8 @@ class Organization(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     logo = models.ImageField(upload_to="org_logos/", blank=True)
+    # IANA name, e.g. "Asia/Kolkata". Meal windows and "today" are evaluated in this zone.
+    timezone = models.CharField(max_length=64, default="UTC")
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -19,6 +24,12 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        try:
+            ZoneInfo(self.timezone)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise ValidationError({"timezone": "Not a valid time zone name, e.g. Asia/Kolkata."})
 
 
 class Category(models.Model):

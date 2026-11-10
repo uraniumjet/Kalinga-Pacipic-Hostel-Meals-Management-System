@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     # New, reusable core (replaces 'student' and 'meals' step by step)
     'organizations',
     'residents',
+    'mess',
 ]
 
 MIDDLEWARE = [
