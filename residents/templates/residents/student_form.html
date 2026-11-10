@@ -1,0 +1,36 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ title }}</h1>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      {% if field.name == "photo" %}
+      <label for="{{ field.id_for_label }}">Photo</label>
+      <div class="row">
+        <img id="photo-preview" class="photo" alt="" {% if student and student.photo %}src="{{ student.photo.url }}"{% endif %}>
+        <div>
+          <input type="file" name="photo" id="id_photo" accept="image/*">
+          <div id="camera-box" hidden>
+            <p><button type="button" id="camera-open">Use camera</button></p>
+            <div id="camera-live" hidden>
+              <video id="camera-video" autoplay playsinline style="max-width:100%;width:18rem;border-radius:.5rem"></video>
+              <p><button type="button" id="camera-snap">Take photo</button> <button type="button" id="camera-cancel">Cancel</button></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+      {% else %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+      {% endif %}
+    {% endfor %}
+    <p style="margin-top:1.25rem"><button type="submit">Save</button> <a href="{% url 'residents:list' %}">Cancel</a></p>
+  </form>
+</div>
+<script src="{% static 'residents/camera.js' %}"></script>
+{% endblock %}

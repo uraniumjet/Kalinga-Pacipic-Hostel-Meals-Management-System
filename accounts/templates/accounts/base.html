@@ -10,6 +10,13 @@
   body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
   header { background:var(--ink); color:#fff; padding:.75rem 1rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
   header form { margin:0; }
+  header nav a { color:#fff; margin-right:1rem; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:.45rem .5rem; border-bottom:1px solid var(--line); }
+  .msg { background:#e6f4ef; border:1px solid #b8dccf; border-radius:.35rem; padding:.5rem .75rem; margin-bottom:1rem; }
+  .photo { width:7rem; height:7rem; object-fit:cover; border-radius:.5rem; border:1px solid var(--line); background:#eef0f3; }
+  .row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
+  a { color:var(--accent); }
   main { max-width:56rem; margin:1.5rem auto; padding:0 1rem; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:.5rem; padding:1rem 1.25rem; margin-bottom:1rem; }
   button, .btn { background:var(--accent); color:#fff; border:0; border-radius:.35rem; padding:.5rem 1rem; font:inherit; cursor:pointer; }
@@ -24,11 +31,15 @@
 <header>
   <strong>{% block brand %}Hostel Meals{% endblock %}</strong>
   {% if user.is_authenticated %}
+  <nav><a href="{% url 'accounts:home' %}">Home</a> <a href="{% url 'residents:list' %}">Students</a></nav>
   <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
     <span>{{ user.get_username }}</span> <button type="submit">Sign out</button>
   </form>
   {% endif %}
 </header>
-<main>{% block content %}{% endblock %}</main>
+<main>
+  {% for message in messages %}<div class="msg">{{ message }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
 </body>
 </html>

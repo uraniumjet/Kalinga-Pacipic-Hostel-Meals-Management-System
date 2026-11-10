@@ -1,0 +1,32 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="row">
+    {% if student.photo %}<img class="photo" src="{{ student.photo.url }}" alt="Photo of {{ student.name }}">{% else %}<div class="photo"></div>{% endif %}
+    <div>
+      <h1 style="margin:0">{{ student.name }}</h1>
+      <p class="muted" style="margin:.25rem 0">{{ student.roll_number }} &middot; {{ student.get_status_display }}</p>
+      <p style="margin:.25rem 0">Room: {% with room=student.current_room %}{% if room %}{{ room }}{% else %}<span class="muted">none</span>{% endif %}{% endwith %}</p>
+      <a href="{% url 'residents:edit' student.pk %}">Edit</a>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <table>
+    <tr><th>Gender</th><td>{{ student.get_gender_display }}</td></tr>
+    <tr><th>Category</th><td>{{ student.category.name }}</td></tr>
+    <tr><th>Diet</th><td>{{ student.diet.name }}</td></tr>
+    <tr><th>Religion</th><td>{{ student.religion|default:"-" }}</td></tr>
+    <tr><th>Course</th><td>{{ student.course|default:"-" }}</td></tr>
+    <tr><th>Department</th><td>{{ student.department|default:"-" }}</td></tr>
+    <tr><th>Country / state</th><td>{{ student.country|default:"-" }} / {{ student.state|default:"-" }}</td></tr>
+    <tr><th>Guardian</th><td>{{ student.guardian_name|default:"-" }} {{ student.guardian_phone }}</td></tr>
+  </table>
+</div>
+<div class="card">
+  <h2>Room history</h2>
+  {% for stay in history %}<p>{{ stay.room }} <span class="muted">from {{ stay.start_date }}{% if stay.end_date %} to {{ stay.end_date }}{% else %} (current){% endif %}</span></p>
+  {% empty %}<p class="muted">No rooms yet.</p>{% endfor %}
+</div>
+{% endblock %}

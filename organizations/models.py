@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone as dj_timezone
 
 
 class Organization(models.Model):
@@ -24,6 +25,10 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
+    def local_today(self):
+        """Today's date in the organisation's own time zone."""
+        return dj_timezone.localtime(dj_timezone.now(), ZoneInfo(self.timezone)).date()
 
     def clean(self):
         try:
