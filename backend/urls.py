@@ -23,6 +23,7 @@ from student.views import student_register
 urlpatterns = [
     path("", student_register),
     path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
     path('api/student/', include('student.urls')),
     path('api/meals/', include('meals.urls')),
     path("student/", include("student.urls")),

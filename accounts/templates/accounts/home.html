@@ -1,0 +1,15 @@
+{% extends "accounts/base.html" %}
+{% block title %}Home{% endblock %}
+{% block brand %}{{ organization.name }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Welcome, {{ user.get_full_name|default:user.get_username }}</h1>
+  <p class="muted">Role: {{ staff.get_role_display }}</p>
+  <p>{{ student_count }} student{{ student_count|pluralize }} in your scope.</p>
+</div>
+<div class="card">
+  <h2>{% if is_admin %}All hostels{% else %}Your hostels{% endif %}</h2>
+  {% for hostel in hostels %}<p>{{ hostel.name }} <span class="muted">({{ hostel.get_gender_display }})</span></p>
+  {% empty %}<p class="muted">No hostels assigned yet.</p>{% endfor %}
+</div>
+{% endblock %}
