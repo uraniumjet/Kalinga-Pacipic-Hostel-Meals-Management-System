@@ -143,3 +143,6 @@ STATICFILES_DIRS = [
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+# Uploaded import files wait here (outside the public media folder) between preview and confirmation.
+IMPORT_STAGING_DIR = BASE_DIR / 'var' / 'import_staging'

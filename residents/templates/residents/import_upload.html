@@ -1,0 +1,25 @@
+{% extends "accounts/base.html" %}
+{% block title %}Import students{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Import students</h1>
+  <p>Upload a spreadsheet saved as <strong>.csv</strong> or <strong>.xlsx</strong>. You will see a preview and nothing is saved until you confirm.</p>
+  <p><a href="{% url 'residents:import_template' %}">Download a template file</a></p>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+    {% endfor %}
+    <p style="margin-top:1.25rem"><button type="submit">Preview</button> <a href="{% url 'residents:list' %}">Cancel</a></p>
+  </form>
+</div>
+<div class="card">
+  <h2>What the file should contain</h2>
+  <p>The first row holds the column titles. Required: <strong>roll_number, name, gender, category, diet</strong>. Optional: religion, course, department, country, state, guardian_name, guardian_phone, hostel, room, photo. Common spellings such as "Roll No", "Student Name" or "Sex" are understood.</p>
+  <p>Gender: male or female. <strong>Category</strong> must be one of: {{ categories|join:", "|default:"(none set up yet)" }}. <strong>Diet</strong> must be one of: {{ diets|join:", "|default:"(none set up yet)" }}.</p>
+  <p>To place a student in a room, give both <strong>hostel</strong> ({{ hostels|join:", "|default:"none" }}) and <strong>room</strong> number; leave both empty to place them later.</p>
+  <p>Photos: put one picture per student in a .zip, named by roll number (for example <code>KU260001.jpg</code>), or name the file in the <em>photo</em> column.</p>
+</div>
+{% endblock %}

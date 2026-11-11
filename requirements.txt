@@ -4,3 +4,4 @@ django-cors-headers>=4.9
 qrcode[pil]>=8.0
 tzdata
 reportlab>=4.2
+openpyxl>=3.1

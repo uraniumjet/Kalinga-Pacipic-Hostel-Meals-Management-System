@@ -19,3 +19,9 @@ db.sqlite3-journal
 .DS_Store
 .vscode/
 .idea/
+
+# Temporary import uploads
+var/
+
+# Generated sample files
+sample_data/

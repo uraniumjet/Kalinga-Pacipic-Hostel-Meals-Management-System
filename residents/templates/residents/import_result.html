@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block title %}Import finished{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Import finished</h1>
+  <p><strong>{{ summary.created }}</strong> student{{ summary.created|pluralize }} imported{% if summary.photos_attached %}, {{ summary.photos_attached }} photo{{ summary.photos_attached|pluralize }} attached{% endif %}.</p>
+  {% if plan.bad_rows %}<p>{{ plan.bad_rows|length }} row{{ plan.bad_rows|length|pluralize }} skipped because of problems in the file.</p>{% endif %}
+  {% if summary.failed %}<h2>Not imported</h2>{% for number, message in summary.failed %}<p class="error">Row {{ number }}: {{ message }}</p>{% endfor %}{% endif %}
+  {% if summary.photo_problems %}<h2>Photos with problems</h2>{% for problem in summary.photo_problems %}<p class="muted">{{ problem }}</p>{% endfor %}{% endif %}
+  <p><a class="btn" style="text-decoration:none;display:inline-block" href="{% url 'residents:list' %}">Go to students</a></p>
+</div>
+{% endblock %}
