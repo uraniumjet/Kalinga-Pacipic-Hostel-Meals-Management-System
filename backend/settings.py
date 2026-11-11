@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'mess',
     'accounts',
     'attendance',
+    'reports',
 ]
 
 MIDDLEWARE = [

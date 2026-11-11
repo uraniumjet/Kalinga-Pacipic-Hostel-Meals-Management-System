@@ -1,0 +1,20 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ table.title }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1 style="margin-bottom:.25rem">{{ table.title }}</h1>
+  <p class="muted" style="margin-top:0">{{ table.subtitle }}</p>
+  <p class="row"><a href="{{ links.csv }}">Download CSV</a> <a href="{{ links.pdf }}">Download PDF</a> <a href="{% url 'reports:index' %}">Back to reports</a></p>
+</div>
+<div class="card" style="overflow-x:auto">
+  <table>
+    <thead><tr>{% for header in table.headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in table.rows %}
+      <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+    {% empty %}<tr><td colspan="{{ table.headers|length }}" class="muted">No records in this period.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% for note in table.notes %}<p class="muted">{{ note }}</p>{% endfor %}
+</div>
+{% endblock %}
