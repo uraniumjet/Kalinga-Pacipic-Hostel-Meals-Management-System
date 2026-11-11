@@ -173,3 +173,10 @@ class CounterTests(TestCase):
         self.assertContains(page, "1 served today")
         self.assertContains(page, "Alice Anand")
         self.assertContains(page, "08:00")
+
+    def test_camera_scan_is_offered_with_a_local_script(self):
+        page = self.client.get(self.url())
+        self.assertContains(page, 'id="scan-open"')
+        self.assertContains(page, "mess/scan.js")
+        self.assertNotContains(page, "unpkg.com")
+        self.assertNotContains(page, "cdn.")

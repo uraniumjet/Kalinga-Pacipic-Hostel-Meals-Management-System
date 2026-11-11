@@ -1,4 +1,5 @@
 {% extends "accounts/base.html" %}
+{% load static %}
 {% block title %}{{ counter.name }} counter{% endblock %}
 {% block content %}
 <div class="card">
@@ -6,11 +7,18 @@
     <h1 style="margin:0">{{ counter.name }} counter</h1>
     <span class="muted">{{ served_today }} served today</span>
   </div>
-  <form method="get" class="row" style="margin-top:1rem">
-    <input type="search" name="q" value="{{ q }}" placeholder="Scan QR, or type roll number or name" style="flex:1;min-width:12rem"
+  <form method="get" id="scan-form" class="row" style="margin-top:1rem">
+    <input type="search" id="scan-input" name="q" value="{{ q }}" placeholder="Scan QR, or type roll number or name" style="flex:1;min-width:12rem"
            {% if not results %}autofocus{% endif %} autocomplete="off">
     <button type="submit">Find</button>
   </form>
+  <div id="scan-box" hidden style="margin-top:.75rem">
+    <button type="button" id="scan-open">Scan with camera</button>
+    <div id="scan-live" hidden>
+      <video id="scan-video" autoplay playsinline muted style="max-width:100%;width:20rem;border-radius:.5rem;margin-top:.5rem"></video>
+      <p><button type="button" id="scan-stop">Stop camera</button></p>
+    </div>
+  </div>
 </div>
 
 {% if q and not results %}<div class="card"><p class="error">No student found for "{{ q }}".</p></div>{% endif %}
@@ -40,4 +48,5 @@
     <p>{{ row.time }} &middot; {{ row.collection.student.name }} <span class="muted">({{ row.collection.student.roll_number }}) &middot; {{ row.collection.meal_type.name }}</span></p>
   {% empty %}<p class="muted">Nothing served yet today.</p>{% endfor %}
 </div>
+<script src="{% static 'mess/scan.js' %}"></script>
 {% endblock %}

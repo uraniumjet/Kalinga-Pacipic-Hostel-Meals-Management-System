@@ -1,6 +1,4 @@
 Django>=6.0,<6.2
-djangorestframework>=3.16
-django-cors-headers>=4.9
 qrcode[pil]>=8.0
 tzdata
 reportlab>=4.2
