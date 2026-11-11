@@ -1,0 +1,12 @@
+{% extends "accounts/base.html" %}
+{% block title %}Roll call{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Roll call</h1>
+  <p class="muted">Open from {{ org.roll_call_start|time:"H:i" }} to {{ org.roll_call_end|time:"H:i" }}. {% if open %}It is open now.{% else %}It is closed now.{% endif %}</p>
+  {% for row in rows %}
+    <p><a class="btn" style="text-decoration:none;display:inline-block" href="{% url 'attendance:rollcall' row.hostel.pk %}">{{ row.hostel.name }}</a>
+      {% if row.done %}<span class="muted">taken today</span>{% endif %}</p>
+  {% empty %}<p class="muted">No hostels assigned.</p>{% endfor %}
+</div>
+{% endblock %}

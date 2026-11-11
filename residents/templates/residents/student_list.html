@@ -20,7 +20,8 @@
       <tr>
         <td>{% if s.photo %}<img src="{{ s.photo.url }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:50%">{% endif %}</td>
         <td><a href="{% url 'residents:detail' s.pk %}">{{ s.roll_number }}</a></td>
-        <td>{{ s.name }}{% if s.status != "active" %} <span class="muted">(left)</span>{% endif %}</td>
+        <td>{{ s.name }}{% if s.status != "active" %} <span class="muted">(left)</span>{% endif %}
+          {% if s.leave %}<br>{% if s.leave.state == "overdue" %}<small class="error">{{ s.leave.text }}</small>{% else %}<small>{{ s.leave.text }}</small>{% endif %}{% endif %}</td>
         <td>{{ s.category.name }}</td>
         <td>{% with a=s.current_allocs.0 %}{% if a %}{{ a.room }}{% else %}<span class="muted">none</span>{% endif %}{% endwith %}</td>
       </tr>

@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.access import students_for
 from accounts.decorators import staff_required
+from attendance.models import RollCallEntry
+from attendance.services import leave_states
 
 from .forms import StudentForm
 from .models import RoomAllocation
@@ -29,6 +31,10 @@ def student_list(request):
     current = RoomAllocation.objects.filter(end_date__isnull=True).select_related("room__hostel")
     students = students.prefetch_related(Prefetch("allocations", queryset=current, to_attr="current_allocs"))
     page = Paginator(students, PAGE_SIZE).get_page(request.GET.get("page"))
+    page.object_list = list(page.object_list)
+    states = leave_states([student.pk for student in page.object_list], request.staff.organization.local_today())
+    for student in page.object_list:
+        student.leave = states.get(student.pk)
     return render(request, "residents/student_list.html", {"page": page, "q": q, "show": show})
 
 
@@ -36,7 +42,16 @@ def student_list(request):
 def student_detail(request, pk):
     student = get_object_or_404(students_for(request.staff).select_related("category", "diet"), pk=pk)
     history = student.allocations.select_related("room__hostel")
-    return render(request, "residents/student_detail.html", {"student": student, "history": history})
+    today = request.staff.organization.local_today()
+    absent = RollCallEntry.objects.filter(student=student, status=RollCallEntry.Status.ABSENT)
+    context = {
+        "student": student,
+        "history": history,
+        "permits": [{"permit": p, "text": p.describe(today), "status": p.status_on(today)} for p in student.permits.filter(cancelled=False)[:5]],
+        "unauthorised_count": absent.count(),
+        "unauthorised_dates": [e.roll_call.date for e in absent.select_related("roll_call").order_by("-roll_call__date")[:5]],
+    }
+    return render(request, "residents/student_detail.html", context)
 
 
 def _save_form(request, instance, title):

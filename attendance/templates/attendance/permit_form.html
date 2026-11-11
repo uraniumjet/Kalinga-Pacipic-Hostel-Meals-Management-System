@@ -1,0 +1,17 @@
+{% extends "accounts/base.html" %}
+{% block title %}Exit permit{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Exit permit</h1>
+  <p class="muted">"Last night away" is the last night the student may be away. If the student is still away the night after, they are recorded as absent without permission.</p>
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+    {% endfor %}
+    <p style="margin-top:1.25rem"><button type="submit">Give permit</button> <a href="{% url 'attendance:permits' %}">Cancel</a></p>
+  </form>
+</div>
+{% endblock %}

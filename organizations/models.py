@@ -3,6 +3,7 @@
 Nothing here is specific to one institution. Categories, diet types, hostels
 and rooms are rows that an administrator creates, not hard-coded choices.
 """
+import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.conf import settings
@@ -18,6 +19,9 @@ class Organization(models.Model):
     logo = models.ImageField(upload_to="org_logos/", blank=True)
     # IANA name, e.g. "Asia/Kolkata". Meal windows and "today" are evaluated in this zone.
     timezone = models.CharField(max_length=64, default="UTC")
+    # Night roll call is only open between these local times (it cannot cross midnight).
+    roll_call_start = models.TimeField(default=datetime.time(20, 0))
+    roll_call_end = models.TimeField(default=datetime.time(23, 59))
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -26,15 +30,21 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
+    def local_now(self, now=None):
+        """The current moment in the organisation's own time zone."""
+        return dj_timezone.localtime(now or dj_timezone.now(), ZoneInfo(self.timezone))
+
     def local_today(self):
         """Today's date in the organisation's own time zone."""
-        return dj_timezone.localtime(dj_timezone.now(), ZoneInfo(self.timezone)).date()
+        return self.local_now().date()
 
     def clean(self):
         try:
             ZoneInfo(self.timezone)
         except (ZoneInfoNotFoundError, ValueError):
             raise ValidationError({"timezone": "Not a valid time zone name, e.g. Asia/Kolkata."})
+        if self.roll_call_start >= self.roll_call_end:
+            raise ValidationError({"roll_call_end": "The roll call must end after it starts."})
 
 
 class Category(models.Model):

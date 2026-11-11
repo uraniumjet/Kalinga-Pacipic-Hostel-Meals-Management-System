@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'residents',
     'mess',
     'accounts',
+    'attendance',
 ]
 
 MIDDLEWARE = [

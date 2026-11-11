@@ -1,0 +1,35 @@
+{% extends "accounts/base.html" %}
+{% block title %}Roll call - {{ hostel.name }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Roll call: {{ hostel.name }}</h1>
+  {% if not open %}<p class="error"><strong>Closed. Open from {{ org.roll_call_start|time:"H:i" }} to {{ org.roll_call_end|time:"H:i" }}.</strong></p>{% endif %}
+  {% if saved %}
+  <p>Saved today: {{ saved.present }} present, {{ saved.on_leave }} on leave, {{ saved.absent }} absent without permission.</p>
+  {% if saved.absent_names %}<p class="error">Without permission: {{ saved.absent_names|join:", " }}</p>{% endif %}
+  {% endif %}
+  <p class="muted">Tick only the students who are NOT in the hostel. Everyone else is recorded as present.</p>
+</div>
+<form method="post">{% csrf_token %}
+  <div class="card">
+    <table>
+      <thead><tr><th>Absent</th><th>Room</th><th>Student</th><th>Leave</th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{% if not row.leave %}<input type="checkbox" name="absent" value="{{ row.student.pk }}" style="width:auto" {% if row.checked %}checked{% endif %}>{% endif %}</td>
+          <td>{{ row.room.number }}</td>
+          <td>{{ row.student.name }} <span class="muted">({{ row.student.roll_number }})</span></td>
+          <td>
+            {% if row.leave %}
+              {% if row.leave.state == "overdue" %}<span class="error">{{ row.leave.text }} - recorded absent</span>{% else %}{{ row.leave.text }}{% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="4" class="muted">No students are placed in this hostel.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <p><button type="submit" {% if not open %}disabled{% endif %}>Save roll call</button></p>
+  </div>
+</form>
+{% endblock %}

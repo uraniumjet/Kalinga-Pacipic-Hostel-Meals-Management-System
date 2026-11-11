@@ -14,6 +14,15 @@
   </div>
 </div>
 <div class="card">
+  <h2>Leave and attendance</h2>
+  {% for row in permits %}
+    <p>{% if row.status == "overdue" %}<strong class="error">{{ row.text }}</strong>{% else %}{{ row.text }}{% endif %}
+      <span class="muted">({{ row.permit.start_date|date:"d M" }} to {{ row.permit.end_date|date:"d M" }}{% if row.permit.destination %}, {{ row.permit.destination }}{% endif %})</span></p>
+  {% empty %}<p class="muted">No exit permits.</p>{% endfor %}
+  <p><a href="{% url 'attendance:permit_create' %}?roll={{ student.roll_number|urlencode }}">Give exit permit</a></p>
+  <p>Absent without permission: <strong>{{ unauthorised_count }}</strong> night{{ unauthorised_count|pluralize }}{% if unauthorised_dates %} <span class="muted">(latest: {% for d in unauthorised_dates %}{{ d|date:"d M" }}{% if not forloop.last %}, {% endif %}{% endfor %})</span>{% endif %}</p>
+</div>
+<div class="card">
   <table>
     <tr><th>Gender</th><td>{{ student.get_gender_display }}</td></tr>
     <tr><th>Category</th><td>{{ student.category.name }}</td></tr>
