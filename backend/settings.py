@@ -131,6 +131,10 @@ STATIC_URL = 'static/'
 # Authentication
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:home'
+
+# Public page where a new organisation registers itself and its first admin.
+# Set ALLOW_ORG_SIGNUP=0 in the environment to switch it off on a locked-down server.
+ALLOW_ORG_SIGNUP = os.environ.get('ALLOW_ORG_SIGNUP', '1') == '1'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Uploaded import files wait here (outside the public media folder) between preview and confirmation.

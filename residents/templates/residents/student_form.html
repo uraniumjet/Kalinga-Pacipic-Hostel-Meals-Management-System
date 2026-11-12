@@ -13,10 +13,10 @@
     {% if not form.fields.category.queryset.exists %}This organisation has no <strong>categories</strong> yet. {% endif %}
     {% if not form.fields.diet.queryset.exists %}This organisation has no <strong>diet types</strong> yet. {% endif %}
     They must exist before a student can be registered.
-    {% if user.is_staff %}
+    {% if user.staff_profile.role == "admin" %}
       <div class="mt-2 d-flex gap-2">
-        {% if not form.fields.category.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'admin:organizations_category_add' %}">Add a category</a>{% endif %}
-        {% if not form.fields.diet.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'admin:organizations_diettype_add' %}">Add a diet type</a>{% endif %}
+        {% if not form.fields.category.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'setup:lookups' %}">Add a category</a>{% endif %}
+        {% if not form.fields.diet.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'setup:lookups' %}">Add a diet type</a>{% endif %}
       </div>
     {% else %}
       Ask an admin to add them.

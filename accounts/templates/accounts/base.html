@@ -38,6 +38,7 @@
         <li class="nav-item"><a class="nav-link {% if app == 'attendance' and 'rollcall' in url %}active{% endif %}" href="{% url 'attendance:rollcall_home' %}"><i class="bi bi-clipboard-check"></i> Roll call</a></li>
         <li class="nav-item"><a class="nav-link {% if app == 'attendance' and 'permit' in url %}active{% endif %}" href="{% url 'attendance:permits' %}"><i class="bi bi-door-open"></i> Permits</a></li>
         <li class="nav-item"><a class="nav-link {% if app == 'reports' %}active{% endif %}" href="{% url 'reports:index' %}"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
+        {% if user.staff_profile.role == "admin" %}<li class="nav-item"><a class="nav-link {% if app == 'setup' %}active{% endif %}" href="{% url 'setup:index' %}"><i class="bi bi-sliders"></i> Setup</a></li>{% endif %}
       </ul>
       {% endwith %}
       <div class="d-flex align-items-center gap-2 py-2 py-lg-0">

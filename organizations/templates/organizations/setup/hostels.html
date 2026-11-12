@@ -1,0 +1,30 @@
+{% extends "accounts/base.html" %}
+{% block title %}Hostels{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="hostels" %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+        <thead><tr><th>Hostel</th><th>For</th><th>Rooms</th><th>Beds</th><th>Living there</th><th></th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+          <tr><td class="fw-semibold">{{ row.hostel.name }}</td><td>{{ row.hostel.get_gender_display }}</td><td>{{ row.rooms }}</td><td>{{ row.beds }}</td><td>{{ row.residents }}</td>
+            <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'setup:hostel' row.hostel.pk %}">Rooms &amp; edit</a></td></tr>
+        {% empty %}<tr><td colspan="6"><div class="empty-state"><i class="bi bi-building"></i>No hostels yet. Add the first one.</div></td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-header">Add a hostel</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        {% include "accounts/_form_errors.html" %}
+        {% for field in form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-primary">Add hostel</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

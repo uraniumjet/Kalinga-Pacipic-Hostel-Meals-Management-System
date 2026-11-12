@@ -1,0 +1,30 @@
+{% extends "accounts/base.html" %}
+{% block title %}Setup{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="org" %}
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-header">Organisation settings</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        {% include "accounts/_form_errors.html" %}
+        {% for field in form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-primary">Save settings</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card"><div class="card-header">Progress</div>
+      <div class="list-group list-group-flush">
+      {% for label, count, link, help in steps %}
+        <a class="list-group-item list-group-item-action bg-transparent d-flex align-items-center gap-3" href="{% url link %}">
+          <i class="bi {% if count %}bi-check-circle-fill text-success{% else %}bi-circle text-warning{% endif %} fs-5"></i>
+          <div class="flex-grow-1"><div class="fw-semibold">{{ label }} <span class="text-body-secondary fw-normal">({{ count }})</span></div><div class="small text-body-secondary">{{ help }}</div></div>
+          <i class="bi bi-chevron-right text-body-secondary"></i>
+        </a>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

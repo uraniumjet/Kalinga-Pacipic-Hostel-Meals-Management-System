@@ -1,0 +1,31 @@
+{% extends "accounts/base.html" %}
+{% block title %}Register your organisation{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7 col-xl-6">
+  <div class="text-center mb-4">
+    <span class="brand-mark mb-3" style="width:3rem;height:3rem;font-size:1.5rem"><i class="bi bi-egg-fried"></i></span>
+    <h1 class="h3">Register your organisation</h1>
+    <p class="text-body-secondary">Create your organisation and its first admin account. You will set up hostels, rooms and wardens next.</p>
+  </div>
+  <form method="post">{% csrf_token %}
+    {% include "accounts/_form_errors.html" %}
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="h6 text-uppercase text-body-secondary">Organisation</h2>
+      {% include "accounts/_field.html" with field=form.organization_name %}
+      {% include "accounts/_field.html" with field=form.timezone %}
+      {% include "accounts/_field.html" with field=form.starter_data %}
+    </div></div>
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="h6 text-uppercase text-body-secondary">Admin account</h2>
+      {% include "accounts/_field.html" with field=form.full_name %}
+      {% include "accounts/_field.html" with field=form.username %}
+      <div class="row">
+        <div class="col-md-6">{% include "accounts/_field.html" with field=form.password1 %}</div>
+        <div class="col-md-6">{% include "accounts/_field.html" with field=form.password2 %}</div>
+      </div>
+    </div></div>
+    <button type="submit" class="btn btn-primary btn-lg w-100">Create organisation</button>
+    <p class="text-center text-body-secondary mt-3">Already registered? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+  </form>
+</div></div>
+{% endblock %}

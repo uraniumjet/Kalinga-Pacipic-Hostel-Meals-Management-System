@@ -1,7 +1,13 @@
-from django.shortcuts import render
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
+from django.http import Http404
+from django.shortcuts import redirect, render
 
 from .access import hostels_for, is_admin, students_for
 from .decorators import staff_required
+from .forms import OrganizationSignupForm
 
 
 @staff_required
@@ -17,11 +23,36 @@ def home(request):
     if context["is_admin"]:
         org = staff.organization
         context["setup"] = [
-            ("Categories", org.categories.count(), "admin:organizations_category_changelist", "Students are grouped by category (for example National, International)."),
-            ("Diet types", org.diet_types.count(), "admin:organizations_diettype_changelist", "Veg, non-veg and so on."),
-            ("Hostels", org.hostels.count(), "admin:organizations_hostel_changelist", "Buildings or blocks that students live in."),
-            ("Meal types", org.meal_types.count(), "admin:mess_mealtype_changelist", "Breakfast, lunch, dinner, with their serving times."),
-            ("Counters", org.counters.count(), "admin:mess_counter_changelist", "Serving points where wardens scan students."),
+            ("Categories", org.categories.count(), "setup:lookups", "Students are grouped by category (for example National, International).", True),
+            ("Diet types", org.diet_types.count(), "setup:lookups", "Veg, non-veg and so on.", True),
+            ("Hostels", org.hostels.count(), "setup:hostels", "Buildings or blocks that students live in.", True),
+            ("Meal types", org.meal_types.count(), "admin:mess_mealtype_changelist", "Breakfast, lunch, dinner, with their serving times.", False),
+            ("Counters", org.counters.count(), "admin:mess_counter_changelist", "Serving points where wardens scan students.", False),
         ]
-        context["setup_missing"] = any(count == 0 for _, count, _, _ in context["setup"])
+        context["setup_missing"] = any(item[1] == 0 for item in context["setup"])
     return render(request, "accounts/home.html", context)
+
+
+class StaffLoginView(LoginView):
+    template_name = "accounts/login.html"
+    redirect_authenticated_user = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["allow_signup"] = settings.ALLOW_ORG_SIGNUP
+        return context
+
+
+def signup(request):
+    """Public page: register a new organisation together with its first admin."""
+    if not settings.ALLOW_ORG_SIGNUP:
+        raise Http404("Registration is switched off.")
+    if request.user.is_authenticated:
+        return redirect("accounts:home")
+    form = OrganizationSignupForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        login(request, user)
+        messages.success(request, "Your organisation is ready. Finish the setup below, then register students.")
+        return redirect("setup:index")
+    return render(request, "accounts/signup.html", {"form": form})

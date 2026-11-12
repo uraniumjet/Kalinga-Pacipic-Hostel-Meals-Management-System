@@ -1,0 +1,6 @@
+<ul class="nav nav-pills mb-4 flex-wrap">
+  <li class="nav-item"><a class="nav-link {% if tab == 'org' %}active{% endif %}" href="{% url 'setup:index' %}"><i class="bi bi-gear"></i> Organisation</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'lists' %}active{% endif %}" href="{% url 'setup:lookups' %}"><i class="bi bi-tags"></i> Categories &amp; diets</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'hostels' %}active{% endif %}" href="{% url 'setup:hostels' %}"><i class="bi bi-building"></i> Hostels &amp; rooms</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'staff' %}active{% endif %}" href="{% url 'setup:staff' %}"><i class="bi bi-person-badge"></i> Staff</a></li>
+</ul>

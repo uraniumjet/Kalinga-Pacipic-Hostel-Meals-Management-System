@@ -1,0 +1,55 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ hostel.name }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="hostels" %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">{{ hostel.name }} <span class="badge text-bg-light border">{{ hostel.get_gender_display }}</span></h2>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'setup:hostels' %}"><i class="bi bi-arrow-left"></i> All hostels</a>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">Rooms ({{ rooms|length }})</div>
+      <div class="table-responsive"><table class="table align-middle mb-0">
+        <thead><tr><th>Room</th><th>Beds</th><th>Living there</th><th></th></tr></thead>
+        <tbody>
+        {% for room in rooms %}
+          <tr><td class="fw-semibold">{{ room.number }}</td><td>{{ room.capacity }}</td><td>{{ room.occupancy }}</td>
+            <td class="text-end"><div class="d-inline-flex gap-1">
+              <a class="btn btn-sm btn-outline-secondary" href="{% url 'setup:room_edit' room.pk %}">Edit</a>
+              <form method="post" action="{% url 'setup:room_delete' room.pk %}" onsubmit="return confirm('Delete room {{ room.number|escapejs }}?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+            </div></td></tr>
+        {% empty %}<tr><td colspan="4"><div class="empty-state"><i class="bi bi-door-closed"></i>No rooms yet. Add them on the right.</div></td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card mb-3"><div class="card-header">Add several rooms</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="bulk">
+        {% include "accounts/_form_errors.html" with form=bulk_form %}
+        {% for field in bulk_form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-primary">Add rooms</button>
+      </form>
+    </div></div>
+    <div class="card mb-3"><div class="card-header">Add one room</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="room">
+        {% include "accounts/_form_errors.html" with form=room_form %}
+        {% for field in room_form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-outline-primary">Add room</button>
+      </form>
+    </div></div>
+    <div class="card mb-3"><div class="card-header">Edit hostel</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="hostel">
+        {% include "accounts/_form_errors.html" with form=edit_form %}
+        {% for field in edit_form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-outline-primary">Save hostel</button>
+      </form>
+    </div></div>
+    <form method="post" action="{% url 'setup:hostel_delete' hostel.pk %}" onsubmit="return confirm('Delete this hostel and all its rooms?')">{% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete hostel</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

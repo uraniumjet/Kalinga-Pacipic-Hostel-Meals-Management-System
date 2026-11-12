@@ -1,0 +1,35 @@
+{% extends "accounts/base.html" %}
+{% load ui %}
+{% block title %}Categories and diet types{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="lists" %}
+<div class="row g-4">
+{% for section in sections %}
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">{{ section.title }}</div>
+      <div class="list-group list-group-flush">
+      {% for row in section.rows %}
+        <div class="list-group-item bg-transparent d-flex align-items-center gap-2">
+          <div class="flex-grow-1">{{ row.name }} <span class="text-body-secondary small">{{ row.used }} student{{ row.used|pluralize }}</span></div>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'setup:lookup_edit' section.kind row.pk %}">Rename</a>
+          <form method="post" action="{% url 'setup:lookup_delete' section.kind row.pk %}" onsubmit="return confirm('Delete {{ row.name|escapejs }}?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"{% if row.used %} disabled title="In use"{% endif %}><i class="bi bi-trash"></i></button></form>
+        </div>
+      {% empty %}<div class="list-group-item bg-transparent text-body-secondary">None yet. Add the first one below.</div>{% endfor %}
+      </div>
+      <div class="card-footer bg-transparent">
+        <form method="post" class="d-flex gap-2 align-items-start">{% csrf_token %}
+          <input type="hidden" name="kind" value="{{ section.kind }}">
+          <div class="flex-grow-1">
+            {{ section.form.name|bs }}
+            {% for error in section.form.name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary">Add {{ section.singular|lower }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

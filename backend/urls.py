@@ -9,6 +9,7 @@ urlpatterns = [
     path("", RedirectView.as_view(pattern_name="accounts:home", permanent=False)),
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
+    path("setup/", include("organizations.setup_urls")),
     path("residents/", include("residents.urls")),
     path("mess/", include("mess.urls")),
     path("attendance/", include("attendance.urls")),

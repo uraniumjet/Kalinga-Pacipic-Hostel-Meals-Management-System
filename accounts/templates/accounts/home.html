@@ -50,18 +50,18 @@
     {% if setup_missing %}<span class="badge text-bg-warning">Needs attention</span>{% else %}<span class="badge text-bg-success">All set</span>{% endif %}
   </div>
   <div class="list-group list-group-flush">
-    {% for label, count, link, help in setup %}
+    {% for label, count, link, help, in_app in setup %}
     <div class="list-group-item bg-transparent d-flex align-items-center gap-3">
       <i class="bi {% if count %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-warning{% endif %} fs-5"></i>
       <div class="flex-grow-1">
         <div class="fw-semibold">{{ label }} <span class="text-body-secondary fw-normal">({{ count }})</span></div>
         <div class="small text-body-secondary">{{ help }}</div>
       </div>
-      {% if user.is_staff %}<a class="btn btn-sm btn-outline-primary" href="{% url link %}">{% if count %}Manage{% else %}Add{% endif %}</a>{% endif %}
+      {% if in_app or user.is_staff %}<a class="btn btn-sm btn-outline-primary" href="{% url link %}">{% if count %}Manage{% else %}Add{% endif %}</a>{% endif %}
     </div>
     {% endfor %}
   </div>
-  {% if not user.is_staff %}<div class="card-footer bg-transparent small text-body-secondary">To add these, sign in to the admin site with an account that has staff access.</div>{% endif %}
+  {% if not user.is_staff %}<div class="card-footer bg-transparent small text-body-secondary">Meal types and counters are added in the admin site, which needs an account with staff access.</div>{% endif %}
 </div>
 {% endif %}
 {% endblock %}

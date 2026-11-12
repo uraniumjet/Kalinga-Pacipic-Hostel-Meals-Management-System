@@ -1,0 +1,25 @@
+{% extends "accounts/base.html" %}
+{% block title %}Staff{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="staff" %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h5 mb-0">Staff accounts</h2>
+  <a class="btn btn-primary" href="{% url 'setup:staff_new' %}"><i class="bi bi-person-plus"></i> Add staff</a>
+</div>
+<div class="card"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Hostels</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr>
+      <td class="fw-semibold">{{ row.user.username }}</td>
+      <td>{{ row.user.get_full_name|default:"-" }}</td>
+      <td><span class="badge {% if row.role == 'admin' %}text-bg-primary{% else %}text-bg-secondary{% endif %}">{{ row.get_role_display }}</span></td>
+      <td>{% if row.role == 'admin' %}<span class="text-body-secondary">all</span>{% else %}{% for h in row.hostels.all %}{{ h.name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-body-secondary">none</span>{% endfor %}{% endif %}</td>
+      <td>{% if row.user.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-light border">Inactive</span>{% endif %}</td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{% url 'setup:staff_edit' row.pk %}">Edit</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}
