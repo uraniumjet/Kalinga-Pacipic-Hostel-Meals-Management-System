@@ -1,13 +1,12 @@
 import secrets
-from datetime import time
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from mess.models import Counter, MealType, MealWindow
 from organizations import demo
-from organizations.models import Category, DietType, Hostel, Organization, Room, StaffProfile
+from organizations.demo_setup import build_setup
+from organizations.models import Organization, StaffProfile
 
 
 class Command(BaseCommand):
@@ -21,24 +20,7 @@ class Command(BaseCommand):
         org, created = Organization.objects.get_or_create(slug=demo.ORG["slug"], defaults=demo.ORG)
         if not created:
             self.stdout.write(f"{org.name} already exists; adding anything that is missing.")
-        categories = {n: Category.objects.get_or_create(organization=org, name=n)[0] for n in demo.CATEGORIES}
-        for n in demo.DIETS:
-            DietType.objects.get_or_create(organization=org, name=n)
-        hostels = []
-        for name, (gender, rooms) in demo.HOSTELS.items():
-            hostel, _ = Hostel.objects.get_or_create(organization=org, name=name, defaults={"gender": gender})
-            hostels.append(hostel)
-            for number, capacity in rooms:
-                Room.objects.get_or_create(hostel=hostel, number=number, defaults={"capacity": capacity})
-        for name, order, start, end in demo.MEALS:
-            meal, _ = MealType.objects.get_or_create(organization=org, name=name, defaults={"sort_order": order})
-            if not meal.windows.filter(special_period__isnull=True).exists():
-                MealWindow.objects.create(
-                    meal_type=meal, start_time=time.fromisoformat(start), end_time=time.fromisoformat(end)
-                )
-        for name, served in demo.COUNTERS:
-            counter, _ = Counter.objects.get_or_create(organization=org, name=name)
-            counter.categories.set([categories[c] for c in served])
+        categories, hostels = build_setup(org)
 
         password = options["password"] or secrets.token_urlsafe(9)
         shown = []

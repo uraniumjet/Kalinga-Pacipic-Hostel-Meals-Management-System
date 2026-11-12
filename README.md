@@ -59,3 +59,15 @@ Business rules live in each app's `services.py`; views call them rather than wri
 A new organisation registers itself at `/accounts/signup/` (organisation name, time zone and the first admin account).
 Admins then use **Setup** in the menu to change organisation settings, manage categories, diet types, hostels, rooms, staff accounts, meal types and serving times, counters and special periods (for example Ramadan, with per-day iftaar times), so the Django admin site is not needed for day-to-day set-up.
 Set `ALLOW_ORG_SIGNUP=0` in the environment to switch the public sign-up page off.
+
+## Fictional test data
+
+`python manage.py seed_test_data` fills the demo organisation with fictional data so every screen has something to show:
+about 60 students with generated photos, two weeks of meals, roll calls and leave in every state (upcoming, on leave,
+overdue, returned, cancelled), a Ramadan period that is running now with iftaar times that move each day, two students
+who have left, and four accounts (`demo_admin`, `demo_warden` for both hostels, `demo_warden_a`, `demo_warden_b`).
+The password is printed once, or set it with `--password`.
+
+- `--reset` wipes the demo organisation's data first (demo only, never a real organisation).
+- `--org SLUG` fills an organisation you registered instead (it must have no students yet); the accounts are then named `SLUG_admin`, `SLUG_warden` and so on.
+- `--students`, `--days`, `--seed` and `--no-photos` change the size, history length, randomness and photos.
