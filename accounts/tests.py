@@ -128,3 +128,46 @@ class ViewTests(Fixture):
             secret(req)
         req.user = self.admin.user
         self.assertEqual(secret(req).status_code, 200)
+
+
+class UiTests(Fixture):
+    def login(self, name):
+        self.client.login(username=name, password="pw12345!")
+
+    def test_pages_use_the_bootstrap_theme(self):
+        self.login("admin1")
+        page = self.client.get(reverse("accounts:home"))
+        self.assertContains(page, "bootstrap@5.3.8")
+        self.assertContains(page, "accounts/app.css")
+        self.assertContains(page, 'id="theme-toggle"')
+
+    def test_registration_warns_when_no_categories_exist(self):
+        empty = Organization.objects.create(name="Empty Org", slug="empty")
+        user = User.objects.create_user("warden_empty", password="pw12345!")
+        StaffProfile.objects.create(user=user, organization=empty, role=StaffProfile.Role.WARDEN)
+        self.login("warden_empty")
+        page = self.client.get(reverse("residents:create"))
+        self.assertContains(page, "Setup is not finished")
+        self.assertContains(page, "no <strong>categories</strong>")
+        self.assertContains(page, "Ask an admin to add them")
+
+    def test_registration_has_no_warning_when_setup_is_done(self):
+        self.login("warden1")
+        page = self.client.get(reverse("residents:create"))
+        self.assertNotContains(page, "Setup is not finished")
+        self.assertContains(page, "National")
+
+    def test_admin_home_shows_setup_checklist_but_warden_does_not(self):
+        self.login("admin1")
+        self.assertContains(self.client.get(reverse("accounts:home")), "Setup checklist")
+        self.client.logout()
+        self.login("warden1")
+        self.assertNotContains(self.client.get(reverse("accounts:home")), "Setup checklist")
+
+    def test_ui_filters(self):
+        from accounts.templatetags.ui import initials, status_colour
+
+        self.assertEqual(initials("Alice Anand"), "AA")
+        self.assertEqual(initials("Bob"), "B")
+        self.assertEqual(initials(""), "?")
+        self.assertEqual(status_colour("overdue"), "danger")

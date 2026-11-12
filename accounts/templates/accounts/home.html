@@ -1,15 +1,67 @@
 {% extends "accounts/base.html" %}
+{% load ui %}
 {% block title %}Home{% endblock %}
 {% block brand %}{{ organization.name }}{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Welcome, {{ user.get_full_name|default:user.get_username }}</h1>
-  <p class="muted">Role: {{ staff.get_role_display }}</p>
-  <p>{{ student_count }} student{{ student_count|pluralize }} in your scope.</p>
+<div class="mb-4">
+  <h1 class="h3 mb-1">Welcome, {{ user.get_full_name|default:user.get_username }}</h1>
+  <p class="text-body-secondary mb-0">Role: {{ staff.get_role_display }}</p>
 </div>
-<div class="card">
-  <h2>{% if is_admin %}All hostels{% else %}Your hostels{% endif %}</h2>
-  {% for hostel in hostels %}<p>{{ hostel.name }} <span class="muted">({{ hostel.get_gender_display }})</span></p>
-  {% empty %}<p class="muted">No hostels assigned yet.</p>{% endfor %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card h-100"><div class="card-body stat">
+      <span class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people"></i></span>
+      <div><div class="stat-value">{{ student_count }}</div><div class="text-body-secondary small">student{{ student_count|pluralize }} in your scope</div></div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card h-100"><div class="card-body stat">
+      <span class="stat-icon bg-info-subtle text-info-emphasis"><i class="bi bi-building"></i></span>
+      <div><div class="stat-value">{{ hostels|length }}</div><div class="text-body-secondary small">hostel{{ hostels|length|pluralize }}</div></div>
+    </div></div>
+  </div>
 </div>
+
+<h2 class="h6 text-uppercase text-body-secondary mb-2">Quick actions</h2>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><a class="card tile h-100" href="{% url 'residents:create' %}"><div class="card-body"><i class="bi bi-person-plus fs-3 text-primary"></i><div class="fw-semibold mt-2">Register student</div></div></a></div>
+  <div class="col-6 col-md-3"><a class="card tile h-100" href="{% url 'mess:counters' %}"><div class="card-body"><i class="bi bi-qr-code-scan fs-3 text-primary"></i><div class="fw-semibold mt-2">Serve meals</div></div></a></div>
+  <div class="col-6 col-md-3"><a class="card tile h-100" href="{% url 'attendance:rollcall_home' %}"><div class="card-body"><i class="bi bi-clipboard-check fs-3 text-primary"></i><div class="fw-semibold mt-2">Roll call</div></div></a></div>
+  <div class="col-6 col-md-3"><a class="card tile h-100" href="{% url 'attendance:permit_create' %}"><div class="card-body"><i class="bi bi-door-open fs-3 text-primary"></i><div class="fw-semibold mt-2">Give exit permit</div></div></a></div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">{% if is_admin %}All hostels{% else %}Your hostels{% endif %}</div>
+  <div class="list-group list-group-flush">
+    {% for hostel in hostels %}
+    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+      <span><i class="bi bi-building text-body-secondary me-2"></i>{{ hostel.name }}</span>
+      <span class="badge text-bg-light border">{{ hostel.get_gender_display }}</span>
+    </div>
+    {% empty %}<div class="list-group-item bg-transparent text-body-secondary">No hostels assigned yet.</div>{% endfor %}
+  </div>
+</div>
+
+{% if is_admin %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Setup checklist</span>
+    {% if setup_missing %}<span class="badge text-bg-warning">Needs attention</span>{% else %}<span class="badge text-bg-success">All set</span>{% endif %}
+  </div>
+  <div class="list-group list-group-flush">
+    {% for label, count, link, help in setup %}
+    <div class="list-group-item bg-transparent d-flex align-items-center gap-3">
+      <i class="bi {% if count %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-warning{% endif %} fs-5"></i>
+      <div class="flex-grow-1">
+        <div class="fw-semibold">{{ label }} <span class="text-body-secondary fw-normal">({{ count }})</span></div>
+        <div class="small text-body-secondary">{{ help }}</div>
+      </div>
+      {% if user.is_staff %}<a class="btn btn-sm btn-outline-primary" href="{% url link %}">{% if count %}Manage{% else %}Add{% endif %}</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% if not user.is_staff %}<div class="card-footer bg-transparent small text-body-secondary">To add these, sign in to the admin site with an account that has staff access.</div>{% endif %}
+</div>
+{% endif %}
 {% endblock %}

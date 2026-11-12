@@ -1,47 +1,47 @@
 {% extends "accounts/base.html" %}
 {% block title %}Import preview{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Preview: {{ filename }}</h1>
-  <p><strong>{{ plan.ok_rows|length }}</strong> of {{ plan.rows|length }} rows are ready to import{% if plan.bad_rows %}, <strong class="error">{{ plan.bad_rows|length }}</strong> have problems{% endif %}.</p>
-  {% if plan.ignored_columns %}<p class="muted">Columns not used: {{ plan.ignored_columns|join:", " }}.</p>{% endif %}
+<div class="card mb-3"><div class="card-body">
+  <h1 class="h3">Preview: {{ filename }}</h1>
+  <p><strong>{{ plan.ok_rows|length }}</strong> of {{ plan.rows|length }} rows are ready to import{% if plan.bad_rows %}, <strong class="text-danger">{{ plan.bad_rows|length }}</strong> have problems{% endif %}.</p>
+  {% if plan.ignored_columns %}<p class="text-body-secondary">Columns not used: {{ plan.ignored_columns|join:", " }}.</p>{% endif %}
   {% if has_photos %}<p>Photos: {{ plan.photos_matched }} matched to students{% if plan.unmatched_photos %}, {{ plan.unmatched_photos|length }} picture(s) belong to nobody in this file{% endif %}.</p>
-  {% for problem in plan.photo_problems %}<p class="muted">{{ problem }}</p>{% endfor %}{% endif %}
-  <div class="row">
+  {% for problem in plan.photo_problems %}<p class="text-body-secondary">{{ problem }}</p>{% endfor %}{% endif %}
+  <div class="d-flex flex-wrap gap-2">
     <form method="post" action="{% url 'residents:import_confirm' %}">{% csrf_token %}
-      <button type="submit" {% if not plan.ok_rows %}disabled{% endif %}>{% if plan.bad_rows %}Skip the {{ plan.bad_rows|length }} problem row{{ plan.bad_rows|length|pluralize }} and import {{ plan.ok_rows|length }}{% else %}Import {{ plan.ok_rows|length }} student{{ plan.ok_rows|length|pluralize }}{% endif %}</button>
+      <button type="submit" class="btn btn-primary" {% if not plan.ok_rows %}disabled{% endif %}>{% if plan.bad_rows %}Skip the {{ plan.bad_rows|length }} problem row{{ plan.bad_rows|length|pluralize }} and import {{ plan.ok_rows|length }}{% else %}Import {{ plan.ok_rows|length }} student{{ plan.ok_rows|length|pluralize }}{% endif %}</button>
     </form>
-    <form method="post" action="{% url 'residents:import_cancel' %}">{% csrf_token %}<button type="submit" style="background:#5b6675">Cancel</button></form>
+    <form method="post" action="{% url 'residents:import_cancel' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary">Cancel</button></form>
   </div>
-  {% if plan.bad_rows %}<p class="muted">To import the problem rows too, cancel, fix the file and upload it again.</p>{% endif %}
-</div>
+  {% if plan.bad_rows %}<p class="text-body-secondary mt-3 mb-0">To import the problem rows too, cancel, fix the file and upload it again.</p>{% endif %}
+</div></div>
 {% if bad_rows %}
-<div class="card">
-  <h2>Problems</h2>
-  <table>
+<div class="card mb-3">
+  <div class="card-header text-danger">Problems</div>
+  <div class="table-responsive"><table class="table align-middle mb-0">
     <thead><tr><th>Row</th><th>Roll no.</th><th>Name</th><th>What is wrong</th></tr></thead>
     <tbody>
     {% for row in bad_rows %}
-      <tr><td>{{ row.number }}</td><td>{{ row.data.roll_number }}</td><td>{{ row.data.name }}</td><td class="error">{% for e in row.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td></tr>
+      <tr><td>{{ row.number }}</td><td>{{ row.data.roll_number }}</td><td>{{ row.data.name }}</td><td class="text-danger">{% for e in row.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td></tr>
     {% endfor %}
     </tbody>
-  </table>
-  {% if plan.bad_rows|length > bad_rows|length %}<p class="muted">Showing the first {{ bad_rows|length }} problems.</p>{% endif %}
+  </table></div>
+  {% if plan.bad_rows|length > bad_rows|length %}<div class="card-footer bg-transparent text-body-secondary small">Showing the first {{ bad_rows|length }} problems.</div>{% endif %}
 </div>
 {% endif %}
 {% if ok_sample %}
 <div class="card">
-  <h2>Ready to import (first {{ ok_sample|length }})</h2>
-  <table>
+  <div class="card-header">Ready to import (first {{ ok_sample|length }})</div>
+  <div class="table-responsive"><table class="table align-middle mb-0">
     <thead><tr><th>Row</th><th>Roll no.</th><th>Name</th><th>Category</th><th>Room</th><th>Photo</th></tr></thead>
     <tbody>
     {% for row in ok_sample %}
       <tr><td>{{ row.number }}</td><td>{{ row.data.roll_number }}</td><td>{{ row.data.name }}</td><td>{{ row.category.name }}</td>
-        <td>{% if row.room %}{{ row.room }}{% else %}<span class="muted">none</span>{% endif %}</td>
-        <td>{% if row.photo_member %}yes{% else %}<span class="muted">no</span>{% endif %}{% for w in row.warnings %}<br><small class="muted">{{ w }}</small>{% endfor %}</td></tr>
+        <td>{% if row.room %}{{ row.room }}{% else %}<span class="text-body-secondary">none</span>{% endif %}</td>
+        <td>{% if row.photo_member %}yes{% else %}<span class="text-body-secondary">no</span>{% endif %}{% for w in row.warnings %}<br><small class="text-body-secondary">{{ w }}</small>{% endfor %}</td></tr>
     {% endfor %}
     </tbody>
-  </table>
+  </table></div>
 </div>
 {% endif %}
 {% endblock %}

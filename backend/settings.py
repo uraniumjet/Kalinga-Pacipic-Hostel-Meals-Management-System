@@ -135,3 +135,8 @@ LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Uploaded import files wait here (outside the public media folder) between preview and confirmation.
 IMPORT_STAGING_DIR = BASE_DIR / 'var' / 'import_staging'
+
+# Django message levels map to Bootstrap alert colours
+from django.contrib.messages import constants as messages_constants  # noqa: E402
+
+MESSAGE_TAGS = {messages_constants.ERROR: 'danger'}

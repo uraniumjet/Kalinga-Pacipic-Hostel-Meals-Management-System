@@ -1,39 +1,47 @@
 {% extends "accounts/base.html" %}
 {% block title %}Students{% endblock %}
 {% block content %}
-<div class="card">
-  <div class="row" style="justify-content:space-between">
-    <h1 style="margin:0">Students</h1>
-    <span class="row"><a href="{% url 'residents:import' %}">Import list</a> <a class="btn" href="{% url 'residents:create' %}" style="text-decoration:none">Register student</a></span>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Students</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'residents:import' %}"><i class="bi bi-upload"></i> Import list</a>
+    <a class="btn btn-primary" href="{% url 'residents:create' %}"><i class="bi bi-person-plus"></i> Register student</a>
   </div>
-  <form method="get" class="row" style="margin-top:1rem">
-    <input type="search" name="q" value="{{ q }}" placeholder="Name or roll number" style="flex:1;min-width:12rem">
-    <select name="show"><option value="active" {% if show != "all" %}selected{% endif %}>Active</option><option value="all" {% if show == "all" %}selected{% endif %}>All</option></select>
-    <button type="submit">Search</button>
-  </form>
 </div>
+<div class="card mb-3"><div class="card-body">
+  <form method="get" class="row g-2">
+    <div class="col-12 col-md"><div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Name or roll number" class="form-control">
+    </div></div>
+    <div class="col-6 col-md-auto"><select name="show" class="form-select"><option value="active" {% if show != "all" %}selected{% endif %}>Active</option><option value="all" {% if show == "all" %}selected{% endif %}>All</option></select></div>
+    <div class="col-6 col-md-auto"><button type="submit" class="btn btn-primary w-100">Search</button></div>
+  </form>
+</div></div>
 <div class="card">
-  <table>
-    <thead><tr><th></th><th>Roll no.</th><th>Name</th><th>Category</th><th>Room</th></tr></thead>
-    <tbody>
-    {% for s in page %}
-      <tr>
-        <td>{% if s.photo %}<img src="{{ s.photo.url }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:50%">{% endif %}</td>
-        <td><a href="{% url 'residents:detail' s.pk %}">{{ s.roll_number }}</a></td>
-        <td>{{ s.name }}{% if s.status != "active" %} <span class="muted">(left)</span>{% endif %}
-          {% if s.leave %}<br>{% if s.leave.state == "overdue" %}<small class="error">{{ s.leave.text }}</small>{% else %}<small>{{ s.leave.text }}</small>{% endif %}{% endif %}</td>
-        <td>{{ s.category.name }}</td>
-        <td>{% with a=s.current_allocs.0 %}{% if a %}{{ a.room }}{% else %}<span class="muted">none</span>{% endif %}{% endwith %}</td>
-      </tr>
-    {% empty %}<tr><td colspan="5" class="muted">No students found.</td></tr>{% endfor %}
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th></th><th>Roll no.</th><th>Name</th><th>Category</th><th>Room</th></tr></thead>
+      <tbody>
+      {% for s in page %}
+        <tr>
+          <td style="width:3.5rem">{% include "accounts/_avatar.html" with student=s size="" %}</td>
+          <td><a class="fw-semibold text-decoration-none" href="{% url 'residents:detail' s.pk %}">{{ s.roll_number }}</a></td>
+          <td>{{ s.name }}{% if s.status != "active" %} <span class="badge text-bg-secondary">left</span>{% endif %}
+            {% if s.leave %}<br>{% if s.leave.state == "overdue" %}<small class="text-danger">{{ s.leave.text }}</small>{% else %}<small class="text-body-secondary">{{ s.leave.text }}</small>{% endif %}{% endif %}</td>
+          <td><span class="badge text-bg-light border">{{ s.category.name }}</span></td>
+          <td>{% with a=s.current_allocs.0 %}{% if a %}{{ a.room }}{% else %}<span class="text-body-secondary">none</span>{% endif %}{% endwith %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="5"><div class="empty-state"><i class="bi bi-people"></i>No students found.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
   {% if page.has_other_pages %}
-  <p>
-    {% if page.has_previous %}<a href="?q={{ q|urlencode }}&show={{ show }}&page={{ page.previous_page_number }}">Previous</a>{% endif %}
-    Page {{ page.number }} of {{ page.paginator.num_pages }}
-    {% if page.has_next %}<a href="?q={{ q|urlencode }}&show={{ show }}&page={{ page.next_page_number }}">Next</a>{% endif %}
-  </p>
+  <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+    <span>{% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?q={{ q|urlencode }}&show={{ show }}&page={{ page.previous_page_number }}">Previous</a>{% endif %}</span>
+    <span class="text-body-secondary small">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    <span>{% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?q={{ q|urlencode }}&show={{ show }}&page={{ page.next_page_number }}">Next</a>{% endif %}</span>
+  </div>
   {% endif %}
 </div>
 {% endblock %}

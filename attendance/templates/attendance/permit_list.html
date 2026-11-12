@@ -1,35 +1,35 @@
 {% extends "accounts/base.html" %}
 {% block title %}Exit permits{% endblock %}
 {% block content %}
-<div class="card">
-  <div class="row" style="justify-content:space-between">
-    <h1 style="margin:0">Exit permits</h1>
-    <a class="btn" href="{% url 'attendance:permit_create' %}" style="text-decoration:none">Give permit</a>
-  </div>
-  <p class="row" style="margin-bottom:0">
-    <a href="?show=current"{% if show != "all" %} style="font-weight:bold"{% endif %}>Open permits</a>
-    <a href="?show=all"{% if show == "all" %} style="font-weight:bold"{% endif %}>All permits</a>
-  </p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Exit permits</h1>
+  <a class="btn btn-primary" href="{% url 'attendance:permit_create' %}"><i class="bi bi-plus-lg"></i> Give permit</a>
 </div>
+<ul class="nav nav-pills mb-3">
+  <li class="nav-item"><a class="nav-link {% if show != 'all' %}active{% endif %}" href="?show=current">Open permits</a></li>
+  <li class="nav-item"><a class="nav-link {% if show == 'all' %}active{% endif %}" href="?show=all">All permits</a></li>
+</ul>
 <div class="card">
-  <table>
-    <thead><tr><th>Student</th><th>Away</th><th>Status</th><th></th></tr></thead>
-    <tbody>
-    {% for row in rows %}
-      <tr>
-        <td><a href="{% url 'residents:detail' row.permit.student.pk %}">{{ row.permit.student.name }}</a> <span class="muted">({{ row.permit.student.roll_number }})</span></td>
-        <td>{{ row.permit.start_date|date:"d M" }} to {{ row.permit.end_date|date:"d M" }}{% if row.permit.destination %}<br><span class="muted">{{ row.permit.destination }}</span>{% endif %}</td>
-        <td>{% if row.status == "overdue" %}<strong class="error">{{ row.text }}</strong>{% else %}{{ row.text }}{% endif %}</td>
-        <td>
-          {% if row.status == "on_leave" or row.status == "overdue" %}
-          <form method="post" action="{% url 'attendance:permit_return' row.permit.pk %}" style="display:inline">{% csrf_token %}<button type="submit">Back</button></form>
-          {% elif row.status == "upcoming" %}
-          <form method="post" action="{% url 'attendance:permit_cancel' row.permit.pk %}" style="display:inline">{% csrf_token %}<button type="submit">Cancel</button></form>
-          {% endif %}
-        </td>
-      </tr>
-    {% empty %}<tr><td colspan="4" class="muted">No permits.</td></tr>{% endfor %}
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Student</th><th>Away</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td><a class="text-decoration-none fw-semibold" href="{% url 'residents:detail' row.permit.student.pk %}">{{ row.permit.student.name }}</a> <span class="text-body-secondary">({{ row.permit.student.roll_number }})</span></td>
+          <td>{{ row.permit.start_date|date:"d M" }} to {{ row.permit.end_date|date:"d M" }}{% if row.permit.destination %}<br><span class="text-body-secondary small">{{ row.permit.destination }}</span>{% endif %}</td>
+          <td>{% if row.status == "overdue" %}<strong class="text-danger">{{ row.text }}</strong>{% else %}{{ row.text }}{% endif %}</td>
+          <td class="text-end">
+            {% if row.status == "on_leave" or row.status == "overdue" %}
+            <form method="post" action="{% url 'attendance:permit_return' row.permit.pk %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success"><i class="bi bi-box-arrow-in-left"></i> Back</button></form>
+            {% elif row.status == "upcoming" %}
+            <form method="post" action="{% url 'attendance:permit_cancel' row.permit.pk %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary">Cancel</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="4"><div class="empty-state"><i class="bi bi-door-open"></i>No permits.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,1 @@
+{% load ui %}{% if student.photo %}<img src="{{ student.photo.url }}" alt="Photo of {{ student.name }}" class="avatar {{ size }}">{% else %}<span class="avatar {{ size }}" aria-hidden="true">{{ student.name|initials }}</span>{% endif %}

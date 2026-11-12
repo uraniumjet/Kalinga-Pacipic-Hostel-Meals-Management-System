@@ -1,20 +1,28 @@
 {% extends "accounts/base.html" %}
 {% block title %}{{ table.title }}{% endblock %}
 {% block content %}
-<div class="card">
-  <h1 style="margin-bottom:.25rem">{{ table.title }}</h1>
-  <p class="muted" style="margin-top:0">{{ table.subtitle }}</p>
-  <p class="row"><a href="{{ links.csv }}">Download CSV</a> <a href="{{ links.pdf }}">Download PDF</a> <a href="{% url 'reports:index' %}">Back to reports</a></p>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">{{ table.title }}</h1>
+    <div class="text-body-secondary">{{ table.subtitle }}</div>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-sm btn-outline-secondary" href="{{ links.csv }}"><i class="bi bi-filetype-csv"></i> Download CSV</a>
+    <a class="btn btn-sm btn-outline-secondary" href="{{ links.pdf }}"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'reports:index' %}"><i class="bi bi-arrow-left"></i> Back to reports</a>
+  </div>
 </div>
-<div class="card" style="overflow-x:auto">
-  <table>
-    <thead><tr>{% for header in table.headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
-    <tbody>
-    {% for row in table.rows %}
-      <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
-    {% empty %}<tr><td colspan="{{ table.headers|length }}" class="muted">No records in this period.</td></tr>{% endfor %}
-    </tbody>
-  </table>
-  {% for note in table.notes %}<p class="muted">{{ note }}</p>{% endfor %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr>{% for header in table.headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for row in table.rows %}
+        <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+      {% empty %}<tr><td colspan="{{ table.headers|length }}"><div class="empty-state"><i class="bi bi-inbox"></i>No records in this period.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if table.notes %}<div class="card-footer bg-transparent">{% for note in table.notes %}<div class="text-body-secondary small">{{ note }}</div>{% endfor %}</div>{% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,6 @@
+{% load ui %}<div class="{{ wrapper|default:'mb-3' }}">
+  <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
+  {{ field|bs }}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</div>

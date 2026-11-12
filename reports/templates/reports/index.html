@@ -1,26 +1,30 @@
 {% extends "accounts/base.html" %}
 {% block title %}Reports{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Reports</h1>
+<h1 class="h3 mb-3">Reports</h1>
+<div class="card mb-4"><div class="card-body">
   <form method="get">
-    {{ form.non_field_errors }}
-    {% for field in form %}
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
-    {% endfor %}
-    <p style="margin-top:1rem"><button type="submit">Update period</button></p>
+    {% include "accounts/_form_errors.html" %}
+    <div class="row g-3 align-items-end">
+    {% for field in form %}{% include "accounts/_field.html" with field=field wrapper="col-12 col-md-4 mb-0" %}{% endfor %}
+    <div class="col-12 col-md-auto"><button type="submit" class="btn btn-primary">Update period</button></div>
+    </div>
   </form>
-  {% if range %}<p class="muted">Period: {{ range.0|date:"j M Y" }}{% if range.0 != range.1 %} to {{ range.1|date:"j M Y" }}{% endif %}</p>{% endif %}
-</div>
+  {% if range %}<p class="text-body-secondary mt-3 mb-0"><i class="bi bi-calendar-range"></i> Period: {{ range.0|date:"j M Y" }}{% if range.0 != range.1 %} to {{ range.1|date:"j M Y" }}{% endif %}</p>{% endif %}
+</div></div>
 {% if range %}
+<div class="row g-3">
 {% for card in cards %}
-<div class="card">
-  <h2 style="margin-top:0">{{ card.title }}</h2>
-  <p class="muted">{{ card.blurb }}</p>
-  <p class="row"><a href="{{ card.html }}">View</a> <a href="{{ card.csv }}">Download CSV</a> <a href="{{ card.pdf }}">Download PDF</a></p>
-</div>
+  <div class="col-md-6"><div class="card h-100"><div class="card-body d-flex flex-column">
+    <h2 class="h5">{{ card.title }}</h2>
+    <p class="text-body-secondary flex-grow-1">{{ card.blurb }}</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-primary" href="{{ card.html }}"><i class="bi bi-eye"></i> View</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ card.csv }}"><i class="bi bi-filetype-csv"></i> Download CSV</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ card.pdf }}"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+    </div>
+  </div></div></div>
 {% endfor %}
+</div>
 {% endif %}
 {% endblock %}

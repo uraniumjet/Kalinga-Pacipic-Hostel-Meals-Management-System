@@ -1,36 +1,64 @@
 {% extends "accounts/base.html" %}
-{% load static %}
+{% load static ui %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>{{ title }}</h1>
-  <form method="post" enctype="multipart/form-data">{% csrf_token %}
-    {{ form.non_field_errors }}
+<div class="row justify-content-center"><div class="col-lg-9 col-xl-8">
+<h1 class="h3 mb-3">{{ title }}</h1>
+
+{% if not form.fields.category.queryset.exists or not form.fields.diet.queryset.exists %}
+<div class="alert alert-warning d-flex gap-3" role="alert">
+  <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+  <div>
+    <strong>Setup is not finished.</strong>
+    {% if not form.fields.category.queryset.exists %}This organisation has no <strong>categories</strong> yet. {% endif %}
+    {% if not form.fields.diet.queryset.exists %}This organisation has no <strong>diet types</strong> yet. {% endif %}
+    They must exist before a student can be registered.
+    {% if user.is_staff %}
+      <div class="mt-2 d-flex gap-2">
+        {% if not form.fields.category.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'admin:organizations_category_add' %}">Add a category</a>{% endif %}
+        {% if not form.fields.diet.queryset.exists %}<a class="btn btn-sm btn-warning" href="{% url 'admin:organizations_diettype_add' %}">Add a diet type</a>{% endif %}
+      </div>
+    {% else %}
+      Ask an admin to add them.
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+  {% include "accounts/_form_errors.html" %}
+  <div class="card mb-3"><div class="card-body">
+    <div class="row g-3">
     {% for field in form %}
       {% if field.name == "photo" %}
-      <label for="{{ field.id_for_label }}">Photo</label>
-      <div class="row">
-        <img id="photo-preview" class="photo" alt="" {% if student and student.photo %}src="{{ student.photo.url }}"{% endif %}>
-        <div>
-          <input type="file" name="photo" id="id_photo" accept="image/*">
-          <div id="camera-box" hidden>
-            <p><button type="button" id="camera-open">Use camera</button></p>
-            <div id="camera-live" hidden>
-              <video id="camera-video" autoplay playsinline style="max-width:100%;width:18rem;border-radius:.5rem"></video>
-              <p><button type="button" id="camera-snap">Take photo</button> <button type="button" id="camera-cancel">Cancel</button></p>
+      <div class="col-12">
+        <label for="id_photo" class="form-label">Photo</label>
+        <div class="d-flex flex-wrap align-items-start gap-3">
+          <img id="photo-preview" class="avatar avatar-xl" alt="" {% if student and student.photo %}src="{{ student.photo.url }}"{% endif %}>
+          <div>
+            <input type="file" name="photo" id="id_photo" accept="image/*" class="form-control">
+            <div id="camera-box" hidden>
+              <button type="button" id="camera-open" class="btn btn-outline-primary btn-sm mt-2"><i class="bi bi-camera"></i> Use camera</button>
+              <div id="camera-live" hidden class="mt-2">
+                <video id="camera-video" autoplay playsinline class="rounded-3" style="max-width:100%;width:18rem"></video>
+                <div class="mt-2 d-flex gap-2"><button type="button" id="camera-snap" class="btn btn-primary btn-sm"><i class="bi bi-camera-fill"></i> Take photo</button> <button type="button" id="camera-cancel" class="btn btn-outline-secondary btn-sm">Cancel</button></div>
+              </div>
             </div>
           </div>
         </div>
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
-      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
       {% else %}
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
-      {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        {% include "accounts/_field.html" with field=field wrapper="col-12 col-md-6" %}
       {% endif %}
     {% endfor %}
-    <p style="margin-top:1.25rem"><button type="submit">Save</button> <a href="{% url 'residents:list' %}">Cancel</a></p>
-  </form>
-</div>
+    </div>
+  </div></div>
+  <div class="sticky-save d-flex gap-2">
+    <button type="submit" class="btn btn-primary px-4">Save</button>
+    <a class="btn btn-outline-secondary" href="{% url 'residents:list' %}">Cancel</a>
+  </div>
+</form>
+</div></div>
 <script src="{% static 'residents/camera.js' %}"></script>
 {% endblock %}

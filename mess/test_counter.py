@@ -179,4 +179,4 @@ class CounterTests(TestCase):
         self.assertContains(page, 'id="scan-open"')
         self.assertContains(page, "mess/scan.js")
         self.assertNotContains(page, "unpkg.com")
-        self.assertNotContains(page, "cdn.")
+        self.assertNotContains(page, "unpkg")

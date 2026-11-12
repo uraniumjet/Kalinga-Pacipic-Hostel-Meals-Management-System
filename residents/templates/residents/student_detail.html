@@ -1,42 +1,56 @@
 {% extends "accounts/base.html" %}
 {% block title %}{{ student.name }}{% endblock %}
 {% block content %}
-<div class="card">
-  <div class="row">
-    {% if student.photo %}<img class="photo" src="{{ student.photo.url }}" alt="Photo of {{ student.name }}">{% else %}<div class="photo"></div>{% endif %}
-    <div>
-      <h1 style="margin:0">{{ student.name }}</h1>
-      <p class="muted" style="margin:.25rem 0">{{ student.roll_number }} &middot; {{ student.get_status_display }}</p>
-      <p style="margin:.25rem 0">Room: {% with room=student.current_room %}{% if room %}{{ room }}{% else %}<span class="muted">none</span>{% endif %}{% endwith %}</p>
-      <a href="{% url 'residents:edit' student.pk %}">Edit</a>
+<div class="card mb-3"><div class="card-body">
+  <div class="d-flex flex-wrap align-items-center gap-3">
+    {% include "accounts/_avatar.html" with student=student size="avatar-xl" %}
+    <div class="flex-grow-1">
+      <h1 class="h3 mb-1">{{ student.name }}</h1>
+      <div class="text-body-secondary mb-1">{{ student.roll_number }} &middot; {{ student.get_status_display }}</div>
+      <div class="mb-2"><i class="bi bi-door-closed text-body-secondary"></i> Room: {% with room=student.current_room %}{% if room %}{{ room }}{% else %}<span class="text-body-secondary">none</span>{% endif %}{% endwith %}</div>
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'residents:edit' student.pk %}"><i class="bi bi-pencil"></i> Edit</a>
     </div>
-    <img src="{% url 'residents:qr' student.pk %}" width="110" height="110" alt="QR code for {{ student.name }}" style="margin-left:auto">
+    <img src="{% url 'residents:qr' student.pk %}" width="120" height="120" alt="QR code for {{ student.name }}" class="rounded-3 border bg-white p-1">
   </div>
-</div>
-<div class="card">
-  <h2>Leave and attendance</h2>
-  {% for row in permits %}
-    <p>{% if row.status == "overdue" %}<strong class="error">{{ row.text }}</strong>{% else %}{{ row.text }}{% endif %}
-      <span class="muted">({{ row.permit.start_date|date:"d M" }} to {{ row.permit.end_date|date:"d M" }}{% if row.permit.destination %}, {{ row.permit.destination }}{% endif %})</span></p>
-  {% empty %}<p class="muted">No exit permits.</p>{% endfor %}
-  <p><a href="{% url 'attendance:permit_create' %}?roll={{ student.roll_number|urlencode }}">Give exit permit</a></p>
-  <p>Absent without permission: <strong>{{ unauthorised_count }}</strong> night{{ unauthorised_count|pluralize }}{% if unauthorised_dates %} <span class="muted">(latest: {% for d in unauthorised_dates %}{{ d|date:"d M" }}{% if not forloop.last %}, {% endif %}{% endfor %})</span>{% endif %}</p>
-</div>
-<div class="card">
-  <table>
-    <tr><th>Gender</th><td>{{ student.get_gender_display }}</td></tr>
-    <tr><th>Category</th><td>{{ student.category.name }}</td></tr>
-    <tr><th>Diet</th><td>{{ student.diet.name }}</td></tr>
-    <tr><th>Religion</th><td>{{ student.religion|default:"-" }}</td></tr>
-    <tr><th>Course</th><td>{{ student.course|default:"-" }}</td></tr>
-    <tr><th>Department</th><td>{{ student.department|default:"-" }}</td></tr>
-    <tr><th>Country / state</th><td>{{ student.country|default:"-" }} / {{ student.state|default:"-" }}</td></tr>
-    <tr><th>Guardian</th><td>{{ student.guardian_name|default:"-" }} {{ student.guardian_phone }}</td></tr>
-  </table>
-</div>
-<div class="card">
-  <h2>Room history</h2>
-  {% for stay in history %}<p>{{ stay.room }} <span class="muted">from {{ stay.start_date }}{% if stay.end_date %} to {{ stay.end_date }}{% else %} (current){% endif %}</span></p>
-  {% empty %}<p class="muted">No rooms yet.</p>{% endfor %}
+</div></div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">Leave and attendance</div>
+      <div class="card-body">
+        {% for row in permits %}
+          <p class="mb-2">{% if row.status == "overdue" %}<strong class="text-danger">{{ row.text }}</strong>{% else %}{{ row.text }}{% endif %}
+            <span class="text-body-secondary">({{ row.permit.start_date|date:"d M" }} to {{ row.permit.end_date|date:"d M" }}{% if row.permit.destination %}, {{ row.permit.destination }}{% endif %})</span></p>
+        {% empty %}<p class="text-body-secondary">No exit permits.</p>{% endfor %}
+        <p><a href="{% url 'attendance:permit_create' %}?roll={{ student.roll_number|urlencode }}"><i class="bi bi-door-open"></i> Give exit permit</a></p>
+        <p class="mb-0">Absent without permission: <strong>{{ unauthorised_count }}</strong> night{{ unauthorised_count|pluralize }}{% if unauthorised_dates %} <span class="text-body-secondary">(latest: {% for d in unauthorised_dates %}{{ d|date:"d M" }}{% if not forloop.last %}, {% endif %}{% endfor %})</span>{% endif %}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">Details</div>
+      <table class="table mb-0">
+        <tr><th class="w-50 fw-normal text-body-secondary">Gender</th><td>{{ student.get_gender_display }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Category</th><td>{{ student.category.name }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Diet</th><td>{{ student.diet.name }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Religion</th><td>{{ student.religion|default:"-" }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Course</th><td>{{ student.course|default:"-" }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Department</th><td>{{ student.department|default:"-" }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Country / state</th><td>{{ student.country|default:"-" }} / {{ student.state|default:"-" }}</td></tr>
+        <tr><th class="fw-normal text-body-secondary">Guardian</th><td>{{ student.guardian_name|default:"-" }} {{ student.guardian_phone }}</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">Room history</div>
+      <div class="list-group list-group-flush">
+        {% for stay in history %}<div class="list-group-item bg-transparent">{{ stay.room }} <span class="text-body-secondary">from {{ stay.start_date }}{% if stay.end_date %} to {{ stay.end_date }}{% else %} (current){% endif %}</span></div>
+        {% empty %}<div class="list-group-item bg-transparent text-body-secondary">No rooms yet.</div>{% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

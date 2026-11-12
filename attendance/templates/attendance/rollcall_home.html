@@ -1,12 +1,16 @@
 {% extends "accounts/base.html" %}
 {% block title %}Roll call{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Roll call</h1>
-  <p class="muted">Open from {{ org.roll_call_start|time:"H:i" }} to {{ org.roll_call_end|time:"H:i" }}. {% if open %}It is open now.{% else %}It is closed now.{% endif %}</p>
+<h1 class="h3 mb-1">Roll call</h1>
+<p class="text-body-secondary">Open from {{ org.roll_call_start|time:"H:i" }} to {{ org.roll_call_end|time:"H:i" }}. {% if open %}<span class="badge text-bg-success">It is open now.</span>{% else %}<span class="badge text-bg-secondary">It is closed now.</span>{% endif %}</p>
+<div class="row g-3">
   {% for row in rows %}
-    <p><a class="btn" style="text-decoration:none;display:inline-block" href="{% url 'attendance:rollcall' row.hostel.pk %}">{{ row.hostel.name }}</a>
-      {% if row.done %}<span class="muted">taken today</span>{% endif %}</p>
-  {% empty %}<p class="muted">No hostels assigned.</p>{% endfor %}
+  <div class="col-sm-6 col-lg-4">
+    <a class="card tile h-100" href="{% url 'attendance:rollcall' row.hostel.pk %}"><div class="card-body d-flex align-items-center gap-3">
+      <span class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-building"></i></span>
+      <div><div class="fw-semibold">{{ row.hostel.name }}</div>{% if row.done %}<div class="small text-success"><i class="bi bi-check-circle"></i> taken today</div>{% else %}<div class="small text-body-secondary">not taken yet</div>{% endif %}</div>
+    </div></a>
+  </div>
+  {% empty %}<div class="col-12"><div class="card"><div class="empty-state"><i class="bi bi-building"></i>No hostels assigned.</div></div></div>{% endfor %}
 </div>
 {% endblock %}
