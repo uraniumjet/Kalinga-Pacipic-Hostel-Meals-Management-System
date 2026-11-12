@@ -1,0 +1,36 @@
+{% extends "accounts/base.html" %}
+{% block title %}Meals{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="meals" %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Order</th><th>Meal</th><th>Normal serving time</th><th></th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{{ row.meal.sort_order }}</td>
+          <td class="fw-semibold">{{ row.meal.name }}</td>
+          <td>{% if row.normal %}{{ row.normal.start_time|time:"H:i" }} &ndash; {{ row.normal.end_time|time:"H:i" }}{% else %}<span class="text-body-secondary">only in special periods</span>{% endif %}</td>
+          <td class="text-end"><div class="d-inline-flex gap-1">
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'setup:meal_edit' row.meal.pk %}">Edit</a>
+            <form method="post" action="{% url 'setup:meal_delete' row.meal.pk %}" onsubmit="return confirm('Delete {{ row.meal.name|escapejs }}?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          </div></td>
+        </tr>
+      {% empty %}<tr><td colspan="4"><div class="empty-state"><i class="bi bi-egg-fried"></i>No meals yet. Add breakfast, lunch and dinner.</div></td></tr>{% endfor %}
+      </tbody>
+    </table></div></div>
+    <p class="text-body-secondary small mt-2">A meal can only be served inside its time window. Times are in the organisation's time zone.</p>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-header">Add a meal</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        {% include "accounts/_form_errors.html" %}
+        {% for field in form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-primary">Add meal</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

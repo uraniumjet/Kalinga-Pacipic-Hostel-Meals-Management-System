@@ -1,0 +1,40 @@
+{% extends "accounts/base.html" %}
+{% block title %}Counters{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="counters" %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Counter</th><th>Serves</th><th></th></tr></thead>
+      <tbody>
+      {% for counter in rows %}
+        <tr>
+          <td class="fw-semibold">{{ counter.name }}</td>
+          <td>{% for c in counter.categories.all %}<span class="badge text-bg-light border">{{ c.name }}</span> {% empty %}<span class="text-body-secondary">every student</span>{% endfor %}</td>
+          <td class="text-end"><div class="d-inline-flex gap-1">
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'setup:counter_edit' counter.pk %}">Edit</a>
+            <form method="post" action="{% url 'setup:counter_delete' counter.pk %}" onsubmit="return confirm('Delete {{ counter.name|escapejs }}?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          </div></td>
+        </tr>
+      {% empty %}<tr><td colspan="3"><div class="empty-state"><i class="bi bi-qr-code"></i>No counters yet. Add the first one.</div></td></tr>{% endfor %}
+      </tbody>
+    </table></div></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-header">Add a counter</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        {% include "accounts/_form_errors.html" %}
+        {% include "accounts/_field.html" with field=form.name %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.categories.label }}</label>
+          {% for choice in form.categories %}<div class="form-check">{{ choice.tag }} <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% empty %}<div class="text-body-secondary">No categories yet.</div>{% endfor %}
+          <div class="form-text">{{ form.categories.help_text }}</div>
+          {% for error in form.categories.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add counter</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

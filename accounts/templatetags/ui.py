@@ -17,6 +17,8 @@ def bs(field):
     """Render a form field with the Bootstrap class that suits its widget."""
     widget = field.field.widget
     kind = widget.__class__.__name__
+    if kind in ("CheckboxSelectMultiple", "RadioSelect"):
+        return field.as_widget()  # these carry their own form-check classes
     if kind == "CheckboxInput":
         css = "form-check-input"
     elif kind in ("Select", "SelectMultiple", "NullBooleanSelect"):

@@ -57,6 +57,5 @@ Business rules live in each app's `services.py`; views call them rather than wri
 ## Organisations and setup
 
 A new organisation registers itself at `/accounts/signup/` (organisation name, time zone and the first admin account).
-Admins then use **Setup** in the menu to change organisation settings, manage categories, diet types, hostels, rooms and staff accounts, so the Django admin site is not needed for these.
-Meal types, counters and special periods are still added in the admin site.
+Admins then use **Setup** in the menu to change organisation settings, manage categories, diet types, hostels, rooms, staff accounts, meal types and serving times, counters and special periods (for example Ramadan, with per-day iftaar times), so the Django admin site is not needed for day-to-day set-up.
 Set `ALLOW_ORG_SIGNUP=0` in the environment to switch the public sign-up page off.

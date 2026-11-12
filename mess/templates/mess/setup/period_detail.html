@@ -1,0 +1,87 @@
+{% extends "accounts/base.html" %}
+{% block title %}{{ period.name }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="periods" %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">{{ period.name }} <span class="text-body-secondary fs-6">{{ period.start_date|date:"j M Y" }} &ndash; {{ period.end_date|date:"j M Y" }}</span></h2>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'setup:periods' %}"><i class="bi bi-arrow-left"></i> All periods</a>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card mb-4">
+      <div class="card-header">Meal times during this period</div>
+      <div class="table-responsive"><table class="table align-middle mb-0">
+        <thead><tr><th>Meal</th><th>Time in this period</th><th></th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+          <tr>
+            <td class="fw-semibold">{{ row.meal.name }}</td>
+            <td>
+              {% if row.skipped %}<span class="badge text-bg-secondary">Not served</span>
+              {% elif row.own %}{{ row.own.start_time|time:"H:i" }} &ndash; {{ row.own.end_time|time:"H:i" }} <span class="badge text-bg-info">period time</span>
+              {% elif row.normal %}{{ row.normal.start_time|time:"H:i" }} &ndash; {{ row.normal.end_time|time:"H:i" }} <span class="text-body-secondary small">(normal time)</span>
+              {% else %}<span class="text-body-secondary">not served</span>{% endif %}
+            </td>
+            <td class="text-end">{% if row.own %}<form method="post" action="{% url 'setup:period_window_clear' period.pk row.meal.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary">Use normal time</button></form>{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card mb-4">
+      <div class="card-header">Different time on one day</div>
+      <div class="list-group list-group-flush">
+        {% for change in day_changes %}
+        <div class="list-group-item bg-transparent d-flex align-items-center gap-2">
+          <div class="flex-grow-1">{{ change.date|date:"D j M" }} &middot; {{ change.window.meal_type.name }}: {{ change.start_time|time:"H:i" }} &ndash; {{ change.end_time|time:"H:i" }}</div>
+          <form method="post" action="{% url 'setup:override_delete' period.pk change.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+        </div>
+        {% empty %}<div class="list-group-item bg-transparent text-body-secondary">None. Use this when a time moves from day to day, such as iftaar following sunset.</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card mb-3"><div class="card-header">Set a meal time for this period</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="window">
+        {% include "accounts/_form_errors.html" with form=window_form %}
+        {% for field in window_form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-primary">Save time</button>
+      </form>
+    </div></div>
+    <div class="card mb-3"><div class="card-header">Set the time for one day</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="override">
+        {% include "accounts/_form_errors.html" with form=override_form %}
+        {% for field in override_form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        <button type="submit" class="btn btn-outline-primary">Save day time</button>
+      </form>
+    </div></div>
+    <div class="card mb-3"><div class="card-header">Period details</div><div class="card-body">
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="details">
+        {% include "accounts/_form_errors.html" with form=details %}
+        {% include "accounts/_field.html" with field=details.name %}
+        <div class="row">
+          <div class="col-6">{% include "accounts/_field.html" with field=details.start_date %}</div>
+          <div class="col-6">{% include "accounts/_field.html" with field=details.end_date %}</div>
+        </div>
+        {% include "accounts/_field.html" with field=details.religion %}
+        <div class="mb-3">
+          <label class="form-label">{{ details.categories.label }}</label>
+          {% for choice in details.categories %}<div class="form-check">{{ choice.tag }} <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% empty %}<div class="text-body-secondary">No categories yet.</div>{% endfor %}
+          <div class="form-text">{{ details.categories.help_text }}</div>
+          {% for error in details.categories.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ details.skipped_meals.label }}</label>
+          {% for choice in details.skipped_meals %}<div class="form-check">{{ choice.tag }} <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% empty %}<div class="text-body-secondary">No meals yet.</div>{% endfor %}
+          {% for error in details.skipped_meals.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Save details</button>
+      </form>
+    </div></div>
+    <form method="post" action="{% url 'setup:period_delete' period.pk %}" onsubmit="return confirm('Delete this period?')">{% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete period</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

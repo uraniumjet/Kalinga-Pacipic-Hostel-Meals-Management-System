@@ -42,6 +42,8 @@ def index(request):
         ("Diet types", org.diet_types.count(), "setup:lookups", "Vegetarian, non-vegetarian and so on."),
         ("Hostels", org.hostels.count(), "setup:hostels", "Buildings or blocks, boys or girls."),
         ("Rooms", Room.objects.filter(hostel__organization=org).count(), "setup:hostels", "Rooms with the number of beds."),
+        ("Meal types", org.meal_types.count(), "setup:meals", "Breakfast, lunch, dinner and their serving times."),
+        ("Counters", org.counters.count(), "setup:counters", "Serving points where wardens scan students."),
         ("Wardens", org.staff.filter(role=StaffProfile.Role.WARDEN).count(), "setup:staff", "Accounts for the people who register students and serve meals."),
     ]
     return render(request, "organizations/setup/index.html", {"form": form, "org": org, "steps": steps})

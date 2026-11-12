@@ -26,8 +26,8 @@ def home(request):
             ("Categories", org.categories.count(), "setup:lookups", "Students are grouped by category (for example National, International).", True),
             ("Diet types", org.diet_types.count(), "setup:lookups", "Veg, non-veg and so on.", True),
             ("Hostels", org.hostels.count(), "setup:hostels", "Buildings or blocks that students live in.", True),
-            ("Meal types", org.meal_types.count(), "admin:mess_mealtype_changelist", "Breakfast, lunch, dinner, with their serving times.", False),
-            ("Counters", org.counters.count(), "admin:mess_counter_changelist", "Serving points where wardens scan students.", False),
+            ("Meal types", org.meal_types.count(), "setup:meals", "Breakfast, lunch, dinner, with their serving times.", True),
+            ("Counters", org.counters.count(), "setup:counters", "Serving points where wardens scan students.", True),
         ]
         context["setup_missing"] = any(item[1] == 0 for item in context["setup"])
     return render(request, "accounts/home.html", context)

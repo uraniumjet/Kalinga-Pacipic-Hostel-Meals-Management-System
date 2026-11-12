@@ -1,0 +1,44 @@
+{% extends "accounts/base.html" %}
+{% block title %}Special periods{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Setup</h1>
+{% include "organizations/setup/_nav.html" with tab="periods" %}
+<p class="text-body-secondary">A special period changes the meal rules for some students between two dates, for example Ramadan: different meal times, and some meals not served.</p>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card"><div class="list-group list-group-flush">
+      {% for period in rows %}
+      <a class="list-group-item list-group-item-action bg-transparent" href="{% url 'setup:period' period.pk %}">
+        <div class="d-flex justify-content-between"><span class="fw-semibold">{{ period.name }}</span><span class="text-body-secondary small">{{ period.start_date|date:"j M Y" }} &ndash; {{ period.end_date|date:"j M Y" }}</span></div>
+        <div class="small text-body-secondary">For: {% if period.religion %}{{ period.religion }}{% else %}all religions{% endif %}, {% for c in period.categories.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}all categories{% endfor %}</div>
+      </a>
+      {% empty %}<div class="list-group-item bg-transparent"><div class="empty-state"><i class="bi bi-moon-stars"></i>No special periods yet.</div></div>{% endfor %}
+    </div></div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card"><div class="card-header">Add a period</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        {% include "accounts/_form_errors.html" %}
+        {% include "accounts/_field.html" with field=form.name %}
+        <div class="row">
+          <div class="col-6">{% include "accounts/_field.html" with field=form.start_date %}</div>
+          <div class="col-6">{% include "accounts/_field.html" with field=form.end_date %}</div>
+        </div>
+        {% include "accounts/_field.html" with field=form.religion %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.categories.label }}</label>
+          {% for choice in form.categories %}<div class="form-check">{{ choice.tag }} <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% empty %}<div class="text-body-secondary">No categories yet.</div>{% endfor %}
+          <div class="form-text">{{ form.categories.help_text }}</div>
+          {% for error in form.categories.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ form.skipped_meals.label }}</label>
+          {% for choice in form.skipped_meals %}<div class="form-check">{{ choice.tag }} <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% empty %}<div class="text-body-secondary">No meals yet.</div>{% endfor %}
+          {% for error in form.skipped_meals.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add period</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

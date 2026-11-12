@@ -1,5 +1,7 @@
 from django.urls import path
 
+from mess import setup_views as m
+
 from . import setup_views as v
 
 app_name = "setup"
@@ -17,4 +19,15 @@ urlpatterns = [
     path("staff/", v.staff_list, name="staff"),
     path("staff/new/", v.staff_edit, name="staff_new"),
     path("staff/<int:pk>/", v.staff_edit, name="staff_edit"),
+    path("meals/", m.meals, name="meals"),
+    path("meals/<int:pk>/edit/", m.meal_edit, name="meal_edit"),
+    path("meals/<int:pk>/delete/", m.meal_delete, name="meal_delete"),
+    path("counters/", m.counters, name="counters"),
+    path("counters/<int:pk>/edit/", m.counter_edit, name="counter_edit"),
+    path("counters/<int:pk>/delete/", m.counter_delete, name="counter_delete"),
+    path("periods/", m.periods, name="periods"),
+    path("periods/<int:pk>/", m.period_detail, name="period"),
+    path("periods/<int:pk>/delete/", m.period_delete, name="period_delete"),
+    path("periods/<int:pk>/meals/<int:meal_pk>/clear/", m.period_window_clear, name="period_window_clear"),
+    path("periods/<int:pk>/day-changes/<int:override_pk>/delete/", m.override_delete, name="override_delete"),
 ]
