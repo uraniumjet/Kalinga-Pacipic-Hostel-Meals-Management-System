@@ -1,0 +1,35 @@
+# One command start:   cp .env.example .env   (edit it)   then   docker compose up -d --build
+# The app listens on http://localhost:8000 and keeps its data in named volumes.
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hostel}
+      POSTGRES_USER: ${POSTGRES_USER:-hostel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-hostel}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-hostel}
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    volumes:
+      - appdata:/data
+
+volumes:
+  pgdata:
+  appdata:

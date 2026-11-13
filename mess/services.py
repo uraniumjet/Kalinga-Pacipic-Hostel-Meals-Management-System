@@ -136,4 +136,4 @@ def record_collection(student, counter, recorded_by=None, collected_by=None, now
     except IntegrityError:
         raise CollectionDenied(
             CollectionDenied.ALREADY_COLLECTED, f"{slot.meal_type.name} was already collected by {student.name}."
-        )
+        ) from None

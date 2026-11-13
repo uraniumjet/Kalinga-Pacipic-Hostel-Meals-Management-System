@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -5,7 +7,6 @@ from django.urls import reverse
 from organizations.models import Category, DietType, Hostel, Organization, Room, StaffProfile
 from residents.models import Student
 from residents.services import allocate_room
-from datetime import date
 
 
 class QrTests(TestCase):

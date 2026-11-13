@@ -1,11 +1,10 @@
 from zoneinfo import available_timezones
 
+from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils.text import slugify
-
-from django import forms
 
 from organizations.models import Category, DietType, Organization, StaffProfile
 

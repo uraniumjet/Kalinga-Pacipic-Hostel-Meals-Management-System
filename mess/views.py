@@ -28,7 +28,7 @@ def counter_screen(request, pk):
         try:
             student_id = int(request.POST.get("student", ""))
         except ValueError:
-            raise Http404("Unknown student")
+            raise Http404("Unknown student") from None
         student = get_object_or_404(Student, pk=student_id, organization=org)
         try:
             collection = record_collection(student, counter, recorded_by=request.user)

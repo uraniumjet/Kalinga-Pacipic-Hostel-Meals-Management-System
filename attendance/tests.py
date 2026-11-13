@@ -9,7 +9,13 @@ from django.urls import reverse
 
 from attendance.models import ExitPermit, RollCall, RollCallEntry
 from attendance.services import (
-    cancel_permit, grant_permit, hostel_sheet, leave_states, record_return, roll_call_is_open, take_roll_call,
+    cancel_permit,
+    grant_permit,
+    hostel_sheet,
+    leave_states,
+    record_return,
+    roll_call_is_open,
+    take_roll_call,
 )
 from organizations.models import Category, DietType, Hostel, Organization, Room, StaffProfile
 from residents.models import Student

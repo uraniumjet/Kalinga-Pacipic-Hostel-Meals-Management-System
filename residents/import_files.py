@@ -83,7 +83,7 @@ def _read_csv(path):
         text = raw.decode("cp1252", errors="replace")  # what Excel on Windows writes
     first_line = next((line for line in text.splitlines() if line.strip()), "")
     delimiter = max(",;\t", key=first_line.count) if first_line.count(",") + first_line.count(";") + first_line.count("\t") else ","
-    return [row for row in csv.reader(io.StringIO(text), delimiter=delimiter)]
+    return list(csv.reader(io.StringIO(text), delimiter=delimiter))
 
 
 def _read_xlsx(path):
@@ -92,7 +92,7 @@ def _read_xlsx(path):
     try:
         workbook = load_workbook(path, read_only=True, data_only=True)
     except Exception:
-        raise ImportFileError("This does not look like a valid Excel (.xlsx) file.")
+        raise ImportFileError("This does not look like a valid Excel (.xlsx) file.") from None
     try:
         rows = []
         for row in workbook.worksheets[0].iter_rows(values_only=True):
@@ -171,7 +171,7 @@ def index_photos(zip_path):
     try:
         archive = zipfile.ZipFile(zip_path)
     except zipfile.BadZipFile:
-        raise ImportFileError("The photo file is not a valid zip archive.")
+        raise ImportFileError("The photo file is not a valid zip archive.") from None
     with archive:
         infos = [i for i in archive.infolist() if not i.is_dir()]
         if len(infos) > MAX_ZIP_MEMBERS:

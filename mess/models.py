@@ -71,9 +71,7 @@ class SpecialPeriod(models.Model):
     def applies_to(self, student):
         if self.religion and student.religion.strip().lower() != self.religion.strip().lower():
             return False
-        if self.categories.exists() and not self.categories.filter(pk=student.category_id).exists():
-            return False
-        return True
+        return not (self.categories.exists() and not self.categories.filter(pk=student.category_id).exists())
 
 
 class MealWindow(models.Model):
@@ -107,9 +105,12 @@ class MealWindow(models.Model):
         return f"{self.meal_type} {self.start_time:%H:%M}-{self.end_time:%H:%M} ({scope})"
 
     def clean(self):
-        if self.special_period_id and self.meal_type_id:
-            if self.special_period.organization_id != self.meal_type.organization_id:
-                raise ValidationError("The meal and the special period must belong to the same organisation.")
+        if (
+            self.special_period_id
+            and self.meal_type_id
+            and self.special_period.organization_id != self.meal_type.organization_id
+        ):
+            raise ValidationError("The meal and the special period must belong to the same organisation.")
 
 
 class WindowOverride(models.Model):

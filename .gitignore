@@ -25,4 +25,9 @@ var/
 
 # Generated sample files
 sample_data/
+
+# Tooling
+.ruff_cache/
+.coverage
+htmlcov/
 *.patch

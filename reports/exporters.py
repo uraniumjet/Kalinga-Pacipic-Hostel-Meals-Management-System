@@ -74,9 +74,8 @@ def to_pdf(table: Table, heading: str = "", footer_note: str = "") -> bytes:
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.units import mm
     from reportlab.pdfgen import canvas
-    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, TableStyle
     from reportlab.platypus import Table as PdfTable
-    from reportlab.platypus import TableStyle
 
     regular, bold = _pdf_fonts()
     title_style = ParagraphStyle("title", fontName=bold, fontSize=15, leading=19)

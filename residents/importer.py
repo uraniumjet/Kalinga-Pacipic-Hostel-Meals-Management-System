@@ -2,9 +2,9 @@
 from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
-from django.core.files.base import ContentFile
 
 from accounts.access import hostels_for
 from organizations.models import Hostel, Room

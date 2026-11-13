@@ -9,7 +9,13 @@ from accounts.decorators import staff_required
 from .forms import PermitForm
 from .models import ExitPermit, RollCall, RollCallEntry
 from .services import (
-    cancel_permit, grant_permit, hostel_sheet, local_now, record_return, roll_call_is_open, take_roll_call,
+    cancel_permit,
+    grant_permit,
+    hostel_sheet,
+    local_now,
+    record_return,
+    roll_call_is_open,
+    take_roll_call,
 )
 
 

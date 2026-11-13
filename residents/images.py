@@ -18,7 +18,7 @@ def normalize_photo(upload):
         image = Image.open(upload)
         image = ImageOps.exif_transpose(image).convert("RGB")
     except Exception:
-        raise ValidationError("Upload a valid image file.")
+        raise ValidationError("Upload a valid image file.") from None
     image.thumbnail((MAX_SIDE, MAX_SIDE))
     buffer = BytesIO()
     image.save(buffer, "JPEG", quality=85, optimize=True)

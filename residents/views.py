@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Prefetch, Q
-from django.http import HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.access import students_for
@@ -14,7 +14,7 @@ from attendance.models import RollCallEntry
 from attendance.services import leave_states
 
 from .forms import StudentForm
-from .models import RoomAllocation
+from .models import RoomAllocation, Student
 
 PAGE_SIZE = 25
 
@@ -85,3 +85,22 @@ def student_qr(request, pk):
     buffer = BytesIO()
     qrcode.make(str(student.qr_token), box_size=8, border=2).save(buffer, format="PNG")
     return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+
+@staff_required
+def student_photo(request, name):
+    """Serve a student's photo to signed-in staff of the same organisation only.
+
+    The file is found through the database (never by building a path from the URL), so nothing outside
+    the student photos can be read, and photos of another organisation answer 404.
+    """
+    student = Student.objects.filter(organization=request.staff.organization, photo=name).first()
+    if student is None or not student.photo:
+        raise Http404("No such photo")
+    try:
+        handle = student.photo.open("rb")
+    except FileNotFoundError:
+        raise Http404("No such photo") from None
+    response = FileResponse(handle)
+    response["Cache-Control"] = "private, max-age=3600"
+    return response

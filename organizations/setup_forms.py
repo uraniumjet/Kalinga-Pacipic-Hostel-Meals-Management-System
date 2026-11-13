@@ -1,5 +1,4 @@
 """Forms for the in-app setup screens. Every form is bound to one organisation."""
-import datetime
 
 from django import forms
 from django.contrib.auth import password_validation

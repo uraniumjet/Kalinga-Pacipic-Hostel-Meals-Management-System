@@ -75,7 +75,7 @@ def meals_daily(staff, start, end, hostel=None):
     while day <= end:
         per_meal = [counts.get((day, meal.pk), 0) for meal in meal_types]
         rows.append([_day_label(day), *per_meal, sum(per_meal)])
-        totals = [t + n for t, n in zip(totals, per_meal)]
+        totals = [t + n for t, n in zip(totals, per_meal, strict=False)]
         day += timedelta(days=1)
     rows.append(["Total", *totals, sum(totals)])
     return Table(
@@ -101,7 +101,7 @@ def meals_students(staff, start, end, hostel=None):
     for s in chosen:
         per_meal = [counts.get((s.pk, meal.pk), 0) for meal in meal_types]
         rows.append([s.roll_number, s.name, rooms.get(s.pk, ""), *per_meal, sum(per_meal)])
-        totals = [t + n for t, n in zip(totals, per_meal)]
+        totals = [t + n for t, n in zip(totals, per_meal, strict=False)]
     rows.append(["Total", "", "", *totals, sum(totals)])
     return Table(
         "Meals per student", _subtitle(staff, start, end, hostel),

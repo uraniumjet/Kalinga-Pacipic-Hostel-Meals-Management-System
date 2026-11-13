@@ -1,0 +1,35 @@
+[project]
+name = "hostel-meals"
+version = "0.1.0"
+description = "Meal counters, night roll call, exit permits and reports for hostels and messes."
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "DJ"]
+ignore = [
+    "SIM108",  # a plain if/else is often clearer than a conditional expression
+    "DJ001",   # nullable text fields are used deliberately in a few places
+    "E501",    # long lines are left to the author (there is no auto-formatter yet)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*/tests.py" = ["B011", "E501"]
+"*/test_*.py" = ["B011", "E501"]
+"backend/settings.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["accounts", "attendance", "backend", "mess", "organizations", "reports", "residents"]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["*/migrations/*", "*/tests.py", "*/test_*.py", "manage.py", "backend/wsgi.py", "backend/asgi.py", ".venv/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

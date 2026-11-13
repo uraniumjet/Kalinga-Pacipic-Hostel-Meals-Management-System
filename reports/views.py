@@ -23,7 +23,10 @@ def _index(request, form, params):
     cards = []
     for kind, (title, blurb, _) in REPORTS.items():
         base = reverse("reports:report", args=[kind])
-        link = lambda fmt: f"{base}?{urlencode({**params, 'format': fmt})}"
+
+        def link(fmt, base=base):
+            return f"{base}?{urlencode({**params, 'format': fmt})}"
+
         cards.append({"title": title, "blurb": blurb, "html": link("html"), "csv": link("csv"), "pdf": link("pdf")})
     return render(request, "reports/index.html", {"form": form, "cards": cards, "range": form.range})
 

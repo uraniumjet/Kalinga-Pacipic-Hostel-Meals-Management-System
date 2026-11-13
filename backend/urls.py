@@ -1,9 +1,11 @@
 """URL configuration. Each app owns its own URLs."""
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
+
+from backend.views import healthz
+from residents.views import student_photo
 
 urlpatterns = [
     path("", RedirectView.as_view(pattern_name="accounts:home", permanent=False)),
@@ -14,7 +16,7 @@ urlpatterns = [
     path("mess/", include("mess.urls")),
     path("attendance/", include("attendance.urls")),
     path("reports/", include("reports.urls")),
+    path("healthz/", healthz, name="healthz"),
+    # Photos are personal data, so they are served by a view that checks who is asking.
+    re_path(r"^" + settings.MEDIA_URL.lstrip("/") + r"(?P<name>.+)$", student_photo, name="media"),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

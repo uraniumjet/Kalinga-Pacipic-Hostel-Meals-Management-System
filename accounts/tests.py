@@ -112,9 +112,10 @@ class ViewTests(Fixture):
         self.assertEqual(self.client.get(reverse("accounts:home")).status_code, 302)
 
     def test_admin_required_blocks_warden(self):
+        from django.core.exceptions import PermissionDenied
         from django.http import HttpResponse
         from django.test import RequestFactory
-        from django.core.exceptions import PermissionDenied
+
         from accounts.decorators import admin_required
 
         @admin_required

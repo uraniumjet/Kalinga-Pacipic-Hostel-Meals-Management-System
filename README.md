@@ -36,10 +36,19 @@ python manage.py make_sample_files   # writes fictional students and photos to s
 ```
 Then open `/residents/import/` and upload `sample_data/students_demo.csv` with `sample_data/photos_demo.zip`. `students_demo_with_errors.csv` has six planted mistakes to show the preview.
 
-## Tests
+## Tests and quality checks
 ```bash
-python manage.py test
+pip install -r requirements-dev.txt
+make check            # ruff, "migrations are up to date", and the full test suite
 ```
+GitHub Actions runs the same checks on every pull request, plus the tests on PostgreSQL, Django's deployment checklist and a Docker build. See `CONTRIBUTING.md`.
+
+## Deploy
+```bash
+cp .env.example .env     # set DJANGO_DEBUG=0, DJANGO_SECRET_KEY, DJANGO_ALLOWED_HOSTS, POSTGRES_PASSWORD
+docker compose up -d --build
+```
+The app answers on port 8000 and `/healthz/` reports its health. Settings, https, backups and upgrades are described in `docs/deployment.md`; security notes are in `SECURITY.md`.
 
 ## Layout
 | App | Purpose |
@@ -49,6 +58,7 @@ python manage.py test
 | `mess` | meal types and windows, counters, special periods, meal collection rules and the counter screen |
 | `attendance` | exit permits and the night roll call |
 | `reports` | report tables and CSV/PDF export |
+| `backend` | project settings (read from environment variables), URLs, the health check |
 | `accounts` | login, organisation sign-up, the admin/warden access rules and the shared page templates |
 
 Business rules live in each app's `services.py`; views call them rather than writing records directly.

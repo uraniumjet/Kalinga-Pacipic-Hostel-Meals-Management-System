@@ -5,7 +5,6 @@ from django.urls import reverse
 
 from mess.models import Counter, MealCollection, MealType, MealWindow, SpecialPeriod, WindowOverride
 from mess.services import current_meal
-from organizations.models import Category
 from organizations.test_setup import SetupBase
 from residents.models import Student
 
@@ -152,7 +151,10 @@ class CounterTests(MealSetupBase):
 
 class PeriodTests(MealSetupBase):
     def make_period(self, **over):
-        data = dict(organization=self.org, name="Ramadan", start_date=date(2026, 11, 1), end_date=date(2026, 11, 30), religion="Muslim")
+        data = {
+            "organization": self.org, "name": "Ramadan", "start_date": date(2026, 11, 1),
+            "end_date": date(2026, 11, 30), "religion": "Muslim",
+        }
         data.update(over)
         return SpecialPeriod.objects.create(**data)
 

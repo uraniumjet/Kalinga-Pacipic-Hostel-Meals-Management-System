@@ -42,7 +42,7 @@ class Organization(models.Model):
         try:
             ZoneInfo(self.timezone)
         except (ZoneInfoNotFoundError, ValueError):
-            raise ValidationError({"timezone": "Not a valid time zone name, e.g. Asia/Kolkata."})
+            raise ValidationError({"timezone": "Not a valid time zone name, e.g. Asia/Kolkata."}) from None
         if self.roll_call_start >= self.roll_call_end:
             raise ValidationError({"roll_call_end": "The roll call must end after it starts."})
 

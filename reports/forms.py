@@ -33,5 +33,5 @@ class ReportFilterForm(forms.Form):
                 cleaned["period"], cleaned.get("date") or self.today, cleaned.get("start"), cleaned.get("end")
             )
         except ValueError as error:
-            raise forms.ValidationError(str(error))
+            raise forms.ValidationError(str(error)) from None
         return cleaned

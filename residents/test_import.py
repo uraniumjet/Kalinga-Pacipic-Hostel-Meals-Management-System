@@ -42,7 +42,7 @@ def csv_upload(body, header=HEADER, name="students.csv"):
 
 
 def parsed(*rows):
-    blank = {column: "" for column in COLUMNS}
+    blank = dict.fromkeys(COLUMNS, "")
     return ParsedFile([(i + 2, {**blank, **row}) for i, row in enumerate(rows)])
 
 

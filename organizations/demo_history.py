@@ -4,7 +4,6 @@ Everything is generated relative to "today" in the organisation's time zone, and
 produced with the real rule engine in mess.services, so the data follows the same rules as the live app.
 """
 import random
-from collections import defaultdict
 from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
@@ -122,7 +121,7 @@ def _permits(org, rng, students, staff_user, today):
         make(student, start, start + timedelta(days=rng.randint(1, 4)))
     for student in plan["on_leave"]:
         make(student, today - timedelta(days=rng.randint(1, 4)), today + timedelta(days=rng.randint(0, 4)))
-    for student, late in zip(plan["overdue"], (1, 2, 4)):
+    for student, late in zip(plan["overdue"], (1, 2, 4), strict=False):
         end = today - timedelta(days=late)
         make(student, end - timedelta(days=3), end)
     for number, student in enumerate(plan["returned"]):

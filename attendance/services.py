@@ -9,7 +9,6 @@ from residents.models import RoomAllocation, Student
 
 from .models import ExitPermit, RollCall, RollCallEntry
 
-
 # ---------- permits ----------
 
 @dataclass(frozen=True)
