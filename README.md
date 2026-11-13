@@ -19,12 +19,16 @@ The system only records facts. It never charges fines: the reports give the cent
 python3 -m venv .venv && source .venv/bin/activate     # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_demo          # a fictional demo organisation and two users (prints a password)
 python manage.py runserver
 ```
-Open http://127.0.0.1:8000/ and sign in as `demo_warden` or `demo_admin`. To start with your own organisation instead, run `python manage.py createsuperuser`, then in `/admin/` create an organisation, its hostels and rooms, categories, diet types, meal types with their windows, counters, and a staff profile for each user.
+Open http://127.0.0.1:8000/ and choose one of:
 
-Settings come from environment variables (see `.env.example`): `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`. The defaults are for local development only.
+- **Your own organisation:** click "Register it here" on the sign-in page. Enter the organisation name, time zone and the first admin account, then follow **Setup** in the menu: categories and diet types, hostels and rooms, meals, counters, special periods and warden accounts.
+- **A fictional demo:** run `python manage.py seed_test_data` (see "Fictional test data" below) and sign in as `demo_admin`, `demo_warden`, `demo_warden_a` or `demo_warden_b` with the password it prints.
+
+The Django admin site at `/admin/` needs a superuser (`python manage.py createsuperuser`); it is only a fallback, since normal set-up is done in the app.
+
+Settings come from environment variables (see `.env.example`): `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `ALLOW_ORG_SIGNUP`. The defaults are for local development only.
 
 ## Try the student import
 ```bash
@@ -40,12 +44,12 @@ python manage.py test
 ## Layout
 | App | Purpose |
 | --- | --- |
-| `organizations` | organisations, categories, diet types, hostels, rooms, staff profiles, demo data |
+| `organizations` | organisations, categories, diet types, hostels, rooms, staff profiles, the Setup screens and demo data |
 | `residents` | students, room allocation, registration, import |
 | `mess` | meal types and windows, counters, special periods, meal collection rules and the counter screen |
 | `attendance` | exit permits and the night roll call |
 | `reports` | report tables and CSV/PDF export |
-| `accounts` | login and the admin/warden access rules |
+| `accounts` | login, organisation sign-up, the admin/warden access rules and the shared page templates |
 
 Business rules live in each app's `services.py`; views call them rather than writing records directly.
 
@@ -54,7 +58,7 @@ Business rules live in each app's `services.py`; views call them rather than wri
 - Student QR codes hold a random token, never the roll number.
 - Camera QR scanning uses the browser's built-in reader. It works in Chrome on Android and in some desktop browsers, and needs the page to be on `localhost` or `https`. A USB scanner or typing always works.
 
-## Organisations and setup
+## Organisations and setup (details)
 
 A new organisation registers itself at `/accounts/signup/` (organisation name, time zone and the first admin account).
 Admins then use **Setup** in the menu to change organisation settings, manage categories, diet types, hostels, rooms, staff accounts, meal types and serving times, counters and special periods (for example Ramadan, with per-day iftaar times), so the Django admin site is not needed for day-to-day set-up.
