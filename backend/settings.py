@@ -7,6 +7,7 @@ Everything that differs between a laptop and a server is read from environment v
 
 import importlib.util
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -131,13 +132,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(os.environ.get("DJANGO_MEDIA_ROOT", BASE_DIR / "media"))
 
 # WhiteNoise serves the static files from the app itself when it is installed (requirements-prod.txt).
-if importlib.util.find_spec("whitenoise") is not None:
+if not DEBUG and importlib.util.find_spec("whitenoise") is not None:
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-    if not DEBUG:
-        STORAGES = {
-            "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-            "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-        }
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
 
 # Authentication
 LOGIN_URL = 'accounts:login'
@@ -182,11 +182,14 @@ X_FRAME_OPTIONS = "DENY"
 # ---------------------------------------------------------------------------
 # Logging: one readable line per event on stdout (what Docker and most hosts collect).
 # ---------------------------------------------------------------------------
+TESTING = sys.argv[1:2] == ["test"]
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {"plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"}},
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "plain"}},
     "root": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO")},
-    "loggers": {"django.request": {"level": "WARNING"}},
+    # 403/404 warnings are useful in production logs, but only noise while the tests deliberately trigger them.
+    "loggers": {"django.request": {"level": "CRITICAL" if TESTING else "WARNING"}},
 }
