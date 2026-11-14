@@ -8,7 +8,16 @@
       <h1 class="h3 mb-1">{{ student.name }}</h1>
       <div class="text-body-secondary mb-1">{{ student.roll_number }} &middot; {{ student.get_status_display }}</div>
       <div class="mb-2"><i class="bi bi-door-closed text-body-secondary"></i> Room: {% with room=student.current_room %}{% if room %}{{ room }}{% else %}<span class="text-body-secondary">none</span>{% endif %}{% endwith %}</div>
-      <a class="btn btn-sm btn-outline-primary" href="{% url 'residents:edit' student.pk %}"><i class="bi bi-pencil"></i> Edit</a>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'residents:edit' student.pk %}"><i class="bi bi-pencil"></i> Edit</a>
+        {% if student.status == "active" %}
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'residents:move' student.pk %}"><i class="bi bi-arrow-left-right"></i> Change room</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'residents:cards' %}?ids={{ student.pk }}"><i class="bi bi-person-badge"></i> ID card</a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'residents:leave' student.pk %}"><i class="bi bi-box-arrow-right"></i> Mark as left</a>
+        {% elif user.staff_profile.role == "admin" %}
+        <a class="btn btn-sm btn-success" href="{% url 'residents:readmit' student.pk %}"><i class="bi bi-arrow-counterclockwise"></i> Re-admit</a>
+        {% endif %}
+      </div>
     </div>
     <img src="{% url 'residents:qr' student.pk %}" width="120" height="120" alt="QR code for {{ student.name }}" class="rounded-3 border bg-white p-1">
   </div>

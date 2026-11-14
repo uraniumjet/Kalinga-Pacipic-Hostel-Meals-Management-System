@@ -6,9 +6,12 @@
 <div class="row g-4">
   <div class="col-lg-6">
     <div class="card"><div class="card-header">Organisation settings</div><div class="card-body">
-      <form method="post">{% csrf_token %}
+      <form method="post" enctype="multipart/form-data">{% csrf_token %}
         {% include "accounts/_form_errors.html" %}
-        {% for field in form %}{% include "accounts/_field.html" with field=field %}{% endfor %}
+        {% for field in form %}
+          {% if field.name == "remove_logo" %}{% if org.logo %}<div class="mb-3 d-flex align-items-center gap-3"><img src="{{ org.logo.url }}" alt="Current logo" style="max-height:56px;max-width:140px" class="border rounded p-1 bg-white">{% include "accounts/_field.html" with field=field %}</div>{% endif %}
+          {% else %}{% include "accounts/_field.html" with field=field %}{% endif %}
+        {% endfor %}
         <button type="submit" class="btn btn-primary">Save settings</button>
       </form>
     </div></div>

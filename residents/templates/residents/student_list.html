@@ -4,6 +4,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
   <h1 class="h3 mb-0">Students</h1>
   <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'residents:cards' %}{% if q %}?q={{ q|urlencode }}{% endif %}"><i class="bi bi-person-badge"></i> Print ID cards</a>
     <a class="btn btn-outline-secondary" href="{% url 'residents:import' %}"><i class="bi bi-upload"></i> Import list</a>
     <a class="btn btn-primary" href="{% url 'residents:create' %}"><i class="bi bi-person-plus"></i> Register student</a>
   </div>

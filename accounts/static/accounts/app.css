@@ -70,3 +70,19 @@ h1, h2, h3, h4, h5 { letter-spacing: -0.01em; }
 .search-big { font-size: 1.15rem; padding: 0.8rem 1rem; }
 .login-wrap { min-height: calc(100vh - 8rem); display: flex; align-items: center; }
 @media print { .app-nav, .btn, footer { display: none !important; } }
+
+/* Printable ID cards: credit-card size, two columns on A4 */
+.id-sheet { display: grid; grid-template-columns: repeat(auto-fill, 86mm); gap: 6mm; justify-content: center; }
+.id-card { width: 86mm; height: 54mm; border: 0.3mm solid #94a3b8; border-radius: 3mm; overflow: hidden; background: #fff; color: #0f172a; break-inside: avoid; display: flex; flex-direction: column; }
+.id-head { background: #0f766e; color: #fff; text-align: center; font-weight: 700; font-size: 3.4mm; padding: 1.4mm 2mm; letter-spacing: 0.02em; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.id-body { flex: 1; display: flex; align-items: center; gap: 2.5mm; padding: 2.5mm 3mm; }
+.id-photo .avatar { width: 22mm; height: 26mm; border-radius: 1.5mm; font-size: 6mm; }
+.id-info { flex: 1; min-width: 0; }
+.id-name { font-weight: 700; font-size: 3.6mm; line-height: 1.2; margin-bottom: 1mm; }
+.id-line { font-size: 2.9mm; color: #334155; }
+.id-qr { width: 20mm; height: 20mm; }
+@media print {
+  body { background: #fff !important; }
+  main.container-xl { max-width: none; padding: 0 !important; }
+  .id-sheet { gap: 4mm; }
+}

@@ -1,0 +1,42 @@
+{% extends "accounts/base.html" %}
+{% block title %}ID cards{% endblock %}
+{% block content %}
+<div class="d-print-none">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">ID cards</h1>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary{% if not total %} disabled{% endif %}" href="{% url 'residents:cards_pdf' %}?{{ query }}&amp;mode=card" target="_blank"><i class="bi bi-credit-card-2-front"></i> PDF, one card per page</a>
+      <a class="btn btn-outline-primary{% if not total %} disabled{% endif %}" href="{% url 'residents:cards_pdf' %}?{{ query }}&amp;mode=sheet" target="_blank"><i class="bi bi-file-earmark-pdf"></i> PDF, A4 sheets (10 per page)</a>
+    </div>
+  </div>
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-12 col-md-4"><select name="hostel" class="form-select" onchange="this.form.submit()">
+      <option value="">All hostels</option>
+      {% for h in hostels %}<option value="{{ h.pk }}" {% if chosen and chosen.pk == h.pk %}selected{% endif %}>{{ h.name }}</option>{% endfor %}
+    </select></div>
+    <div class="col-12 col-md"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Name or roll number"></div>
+    <div class="col-12 col-md-auto"><button type="submit" class="btn btn-outline-secondary w-100">Filter</button></div>
+  </form>
+  <p class="text-body-secondary">{{ total }} card{{ total|pluralize }}{% if total > limit %}. Only the first {{ limit }} are shown; narrow the filter to print the rest{% endif %}. </p>
+  <p class="small text-body-secondary">Cards are standard bank-card size (85.6 &times; 54 mm). Use "one card per page" for a card printer or print shop. For an office printer use the A4 sheets, print at 100% (actual size), double-sided, flip on the long edge. Up to {{ pdf_limit }} cards per download. {% if not organization.logo %}No logo yet: <a href="{% url 'setup:index' %}">add one in Setup</a> to print it on the cards.{% endif %}</p>
+</div>
+<div class="id-sheet">
+{% for s in students %}
+  <div class="id-card">
+    <div class="id-head">{{ organization.name }}</div>
+    <div class="id-body">
+      <div class="id-photo">{% include "accounts/_avatar.html" with student=s size="avatar-xl" %}</div>
+      <div class="id-info">
+        <div class="id-name">{{ s.name }}</div>
+        <div class="id-line">Roll no. {{ s.roll_number }}</div>
+        <div class="id-line">{{ s.category.name }}</div>
+        {% with a=s.current_allocs.0 %}{% if a %}<div class="id-line">{{ a.room }}</div>{% endif %}{% endwith %}
+      </div>
+      <img class="id-qr" src="{% url 'residents:qr' s.pk %}" alt="QR code for {{ s.name }}">
+    </div>
+  </div>
+{% empty %}
+  <div class="empty-state d-print-none"><i class="bi bi-person-badge"></i>No students to print.</div>
+{% endfor %}
+</div>
+{% endblock %}

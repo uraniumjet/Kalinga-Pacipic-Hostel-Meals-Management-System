@@ -89,3 +89,56 @@ class StudentForm(forms.ModelForm):
             elif room and (current is None or current.pk != room.pk):
                 allocate_room(student, room, student.organization.local_today())
         return student
+
+
+DATE_INPUT = forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"})
+
+
+class _DatedForm(forms.Form):
+    """A form with an effective date that cannot be in the future."""
+
+    def __init__(self, *args, today, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.today = today
+        self.fields["date"].initial = today
+        self.fields["date"].widget.attrs["max"] = today.isoformat()
+
+    def clean_date(self):
+        day = self.cleaned_data["date"]
+        if day > self.today:
+            raise forms.ValidationError("The date cannot be in the future.")
+        return day
+
+
+def _rooms_with_space(staff, student, keep=None):
+    rooms = (
+        Room.objects.filter(hostel__in=hostels_for(staff), hostel__gender=student.gender)
+        .select_related("hostel")
+        .annotate(occ=Count("allocations", filter=Q(allocations__end_date__isnull=True)))
+        .filter(occ__lt=F("capacity"))
+    )
+    if keep is not None:
+        rooms = rooms.exclude(pk=keep.pk)
+    return rooms.order_by("hostel__name", "number")
+
+
+class MoveRoomForm(_DatedForm):
+    room = RoomChoiceField(queryset=Room.objects.none(), label="New room")
+    date = forms.DateField(widget=DATE_INPUT, label="Moves on")
+
+    def __init__(self, *args, staff, student, today, **kwargs):
+        super().__init__(*args, today=today, **kwargs)
+        self.fields["room"].queryset = _rooms_with_space(staff, student, keep=student.current_room)
+
+
+class MarkLeftForm(_DatedForm):
+    date = forms.DateField(widget=DATE_INPUT, label="Left on")
+
+
+class ReadmitForm(_DatedForm):
+    room = RoomChoiceField(queryset=Room.objects.none(), required=False, empty_label="No room yet", label="Room")
+    date = forms.DateField(widget=DATE_INPUT, label="Back on")
+
+    def __init__(self, *args, staff, student, today, **kwargs):
+        super().__init__(*args, today=today, **kwargs)
+        self.fields["room"].queryset = _rooms_with_space(staff, student)

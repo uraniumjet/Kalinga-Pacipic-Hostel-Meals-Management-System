@@ -3,21 +3,40 @@
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import UploadedFile
 
 from accounts.forms import timezone_choices
+from organizations.images import normalize_logo
 from organizations.models import Category, DietType, Hostel, Organization, Room, StaffProfile
 
 TIME_WIDGET = forms.TimeInput(format="%H:%M", attrs={"type": "time"})
 
 
 class OrganizationForm(forms.ModelForm):
+    remove_logo = forms.BooleanField(required=False, label="Remove the current logo")
     timezone = forms.ChoiceField(choices=timezone_choices, help_text="Meal times and 'today' follow this zone.")
     roll_call_start = forms.TimeField(widget=TIME_WIDGET, label="Roll call opens")
     roll_call_end = forms.TimeField(widget=TIME_WIDGET, label="Roll call closes")
 
     class Meta:
         model = Organization
-        fields = ["name", "timezone", "roll_call_start", "roll_call_end"]
+        fields = ["name", "logo", "timezone", "roll_call_start", "roll_call_end"]
+        widgets = {"logo": forms.FileInput(attrs={"accept": "image/*"})}
+        help_texts = {"logo": "Printed on student ID cards. A square or wide PNG with a transparent background works best (max 2 MB)."}
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        if isinstance(logo, UploadedFile):
+            return normalize_logo(logo)
+        return logo
+
+    def save(self, commit=True):
+        org = super().save(commit=False)
+        if self.cleaned_data.get("remove_logo") and "logo" not in self.files:
+            org.logo = ""
+        if commit:
+            org.save()
+        return org
 
 
 class NameForm(forms.ModelForm):

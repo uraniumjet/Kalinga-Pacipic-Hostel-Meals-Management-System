@@ -32,7 +32,7 @@ def _org(request):
 @admin_required
 def index(request):
     org = _org(request)
-    form = OrganizationForm(request.POST or None, instance=org)
+    form = OrganizationForm(request.POST or None, request.FILES or None, instance=org)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Organisation settings saved.")
